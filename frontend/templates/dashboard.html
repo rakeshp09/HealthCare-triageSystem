@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Workspace Dashboard - TriageFlow{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-12 space-y-8">
+  <div class="text-center max-w-2xl mx-auto">
+    <span class="text-xs font-bold uppercase tracking-wider text-teal-700 bg-teal-50 px-3 py-1 rounded-full border border-teal-200">
+      Role-Based Access
+    </span>
+    <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight mt-3">
+      Clinical Workspaces
+    </h1>
+    <p class="text-xs text-slate-600 mt-2">
+      Select your clinical role workspace or view your active account dashboard.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+    <a
+      href="{{ url_for('backend.nurse_dashboard') }}"
+      class="p-6 rounded-2xl bg-white border border-slate-200 hover:border-teal-500 shadow-sm hover:shadow-md transition space-y-3 group"
+    >
+      <div class="w-12 h-12 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center group-hover:scale-105 transition-transform">
+        <i data-lucide="users" class="w-6 h-6"></i>
+      </div>
+      <h3 class="text-base font-bold text-slate-900">Health Worker & Nurse Portal</h3>
+      <p class="text-xs text-slate-600">
+        Initiate new patient triage, record multimodal voice and scans, enter physiological vitals, and send cases to doctor.
+      </p>
+      <span class="inline-flex items-center gap-1 text-xs font-semibold text-teal-700">Open Workspace →</span>
+    </a>
+
+    <a
+      href="{{ url_for('backend.doctor_dashboard') }}"
+      class="p-6 rounded-2xl bg-white border border-slate-200 hover:border-indigo-500 shadow-sm hover:shadow-md transition space-y-3 group"
+    >
+      <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-800 flex items-center justify-center group-hover:scale-105 transition-transform">
+        <i data-lucide="stethoscope" class="w-6 h-6"></i>
+      </div>
+      <h3 class="text-base font-bold text-slate-900">Doctor / Reviewer Queue</h3>
+      <p class="text-xs text-slate-600">
+        Assess incoming multimodal dossiers, review AI extractions, escalate high-risk conditions, and sign off on referrals.
+      </p>
+      <span class="inline-flex items-center gap-1 text-xs font-semibold text-indigo-700">Open Workspace →</span>
+    </a>
+
+    <a
+      href="{{ url_for('backend.patient_dashboard') }}"
+      class="p-6 rounded-2xl bg-white border border-slate-200 hover:border-emerald-500 shadow-sm hover:shadow-md transition space-y-3 group"
+    >
+      <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center group-hover:scale-105 transition-transform">
+        <i data-lucide="user-check" class="w-6 h-6"></i>
+      </div>
+      <h3 class="text-base font-bold text-slate-900">Patient Community Portal</h3>
+      <p class="text-xs text-slate-600">
+        View personal triage consultation dossiers, recorded audio statements, and doctor review status.
+      </p>
+      <span class="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700">Open Workspace →</span>
+    </a>
+
+    <a
+      href="{{ url_for('backend.admin_dashboard') }}"
+      class="p-6 rounded-2xl bg-white border border-slate-200 hover:border-slate-400 shadow-sm hover:shadow-md transition space-y-3 group"
+    >
+      <div class="w-12 h-12 rounded-xl bg-slate-100 text-slate-800 flex items-center justify-center group-hover:scale-105 transition-transform">
+        <i data-lucide="shield" class="w-6 h-6"></i>
+      </div>
+      <h3 class="text-base font-bold text-slate-900">Admin Governance Console</h3>
+      <p class="text-xs text-slate-600">
+        Review pending Doctor and Staff account requests, monitor system throughput, and maintain audit compliance.
+      </p>
+      <span class="inline-flex items-center gap-1 text-xs font-semibold text-slate-800">Open Workspace →</span>
+    </a>
+  </div>
+</div>
+{% endblock %}

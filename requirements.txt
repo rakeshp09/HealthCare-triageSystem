@@ -1,0 +1,34 @@
+# Healthcare Triage Assistant Model - Unified Dependencies
+
+# FastAPI Backend & Server
+fastapi>=0.110.0
+uvicorn[standard]>=0.28.0
+python-multipart>=0.0.9
+a2wsgi>=1.10.0
+
+# Flask Frontend & UI
+Flask>=3.0.0
+Werkzeug>=3.0.0
+Jinja2>=3.1.0
+Flask-SQLAlchemy>=3.1.0
+Babel>=2.14.0
+
+# Database & ORM (PostgreSQL)
+SQLAlchemy>=2.0.0
+psycopg2-binary>=2.9.9
+
+# Security & Validation
+pydantic>=2.7.0
+pydantic-settings>=2.2.0
+PyJWT>=2.8.0
+python-dotenv>=1.0.0
+
+# AI, RAG & Vector Database (Google Gemini AI)
+google-genai>=0.1.0
+google-generativeai>=0.8.0
+chromadb>=0.4.15
+requests>=2.31.0
+
+# Media & Utilities
+Pillow>=10.0.0
+reportlab>=4.1.0

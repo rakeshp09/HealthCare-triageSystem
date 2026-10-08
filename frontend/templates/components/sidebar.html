@@ -1,0 +1,89 @@
+<!-- Reusable Healthcare Triage Sidebar Component (English Only) -->
+<aside class="w-full lg:w-64 shrink-0">
+  <div class="clinic-sidebar p-4 space-y-2 sticky top-24 bg-white rounded-2xl border border-slate-200/90 shadow-sm">
+    
+    <!-- User Quick Profile Pill in Sidebar -->
+    {% if user %}
+    <div class="p-3 mb-2 rounded-2xl bg-[#002B5B] text-white flex items-center gap-3 shadow-xs">
+      <div class="w-10 h-10 rounded-xl bg-[#C7F2E3] text-[#002B5B] font-black flex items-center justify-center text-sm shadow-xs shrink-0">
+        {{ user.name[:2]|upper if user.name else 'TF' }}
+      </div>
+      <div class="overflow-hidden">
+        <div class="font-bold text-xs truncate">{{ user.name }}</div>
+        <div class="text-[10px] text-teal-300 font-medium tracking-wide uppercase">{{ user.role }}</div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Navigation Links Aligned Vertically with #002B5B Active Accent -->
+    <nav class="space-y-1.5 text-xs font-semibold" aria-label="Sidebar Navigation">
+      
+      <!-- 1. Dashboard -->
+      {% set dash_url = url_for('frontend.patient_dashboard') if user and user.role == 'Patient' else (url_for('frontend.doctor_dashboard') if user and 'Doctor' in user.role else (url_for('frontend.nurse_dashboard') if user and ('Nurse' in user.role or 'Health Worker' in user.role) else url_for('frontend.dashboard'))) %}
+      <a
+        href="{{ dash_url }}"
+        class="flex items-center gap-3 px-3.5 py-3 rounded-xl transition duration-150 {% if active_page == 'dashboard' %}bg-[#002B5B] text-white shadow-sm font-bold{% else %}text-slate-700 hover:text-[#002B5B] hover:bg-slate-100{% endif %}"
+        aria-label="Dashboard"
+      >
+        <i data-lucide="layout-dashboard" class="w-4 h-4 shrink-0 {% if active_page == 'dashboard' %}text-[#C7F2E3]{% else %}text-slate-500{% endif %}"></i>
+        <span>Dashboard</span>
+      </a>
+
+      <!-- 2. Case Management -->
+      {% set case_url = url_for('frontend.case_directory') if user and user.role != 'Patient' else (dash_url ~ '#case-management') %}
+      <a
+        href="{{ case_url }}"
+        class="flex items-center gap-3 px-3.5 py-3 rounded-xl transition duration-150 {% if active_page == 'case_management' %}bg-[#002B5B] text-white shadow-sm font-bold{% else %}text-slate-700 hover:text-[#002B5B] hover:bg-slate-100{% endif %}"
+        aria-label="Case Management"
+      >
+        <i data-lucide="folder-kanban" class="w-4 h-4 shrink-0 {% if active_page == 'case_management' %}text-[#C7F2E3]{% else %}text-slate-500{% endif %}"></i>
+        <span>Case Management</span>
+      </a>
+
+      <!-- 3. Referrals -->
+      {% set referral_url = dash_url ~ '#referrals' %}
+      <a
+        href="{{ referral_url }}"
+        class="flex items-center gap-3 px-3.5 py-3 rounded-xl transition duration-150 {% if active_page == 'referrals' %}bg-[#002B5B] text-white shadow-sm font-bold{% else %}text-slate-700 hover:text-[#002B5B] hover:bg-slate-100{% endif %}"
+        aria-label="Referrals"
+      >
+        <i data-lucide="send" class="w-4 h-4 shrink-0 {% if active_page == 'referrals' %}text-[#C7F2E3]{% else %}text-slate-500{% endif %}"></i>
+        <span>Referrals</span>
+      </a>
+
+      <!-- 4. Health Records -->
+      <a
+        href="{{ url_for('frontend.health_page') }}"
+        class="flex items-center gap-3 px-3.5 py-3 rounded-xl transition duration-150 {% if active_page == 'health' %}bg-[#002B5B] text-white shadow-sm font-bold{% else %}text-slate-700 hover:text-[#002B5B] hover:bg-slate-100{% endif %}"
+        aria-label="Health Records"
+      >
+        <i data-lucide="file-heart" class="w-4 h-4 shrink-0 {% if active_page == 'health' %}text-[#C7F2E3]{% else %}text-slate-500{% endif %}"></i>
+        <span>Health Records</span>
+      </a>
+
+      <!-- 5. Profile -->
+      <a
+        href="{{ url_for('frontend.profile_page') }}"
+        class="flex items-center gap-3 px-3.5 py-3 rounded-xl transition duration-150 {% if active_page == 'profile' %}bg-[#002B5B] text-white shadow-sm font-bold{% else %}text-slate-700 hover:text-[#002B5B] hover:bg-slate-100{% endif %}"
+        aria-label="Profile"
+      >
+        <i data-lucide="user-cog" class="w-4 h-4 shrink-0 {% if active_page == 'profile' %}text-[#C7F2E3]{% else %}text-slate-500{% endif %}"></i>
+        <span>Profile</span>
+      </a>
+
+    </nav>
+
+    <!-- Quick Action: Start New Intake / Case -->
+    <div class="pt-4 border-t border-slate-100">
+      <a
+        href="{{ url_for('frontend.new_case_wizard') }}"
+        class="w-full py-2.5 px-3 bg-[#002B5B] hover:bg-[#001D3D] text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-2"
+        aria-label="Start New Case"
+      >
+        <i data-lucide="plus-circle" class="w-4 h-4 text-[#C7F2E3]"></i>
+        <span>Start New Case</span>
+      </a>
+    </div>
+
+  </div>
+</aside>

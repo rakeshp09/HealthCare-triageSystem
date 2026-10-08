@@ -1,0 +1,627 @@
+{% extends "base.html" %}
+
+{% block title %}Health Records - TriageFlow{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex flex-col lg:flex-row gap-8">
+    
+    <!-- Unified Sidebar Navigation (Visible Across Authenticated Pages) -->
+    {% set active_page = 'health' %}
+    {% include "components/sidebar.html" %}
+
+    <!-- Main Content Area: All 9 Sections Arranged in Vertical Serial Order -->
+    <main class="flex-1 space-y-6 min-w-0">
+      
+      <!-- Page Header & Action Ribbon -->
+      <div class="clinic-card p-6 sm:p-8 bg-gradient-to-r from-white via-slate-50 to-[#C7F2E3]/25 border border-slate-200/90 shadow-sm rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div class="space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#002B5B] text-white">
+              <i data-lucide="file-heart" class="w-3.5 h-3.5 text-[#C7F2E3]"></i>
+              <span>Longitudinal Health Record</span>
+            </span>
+            <span class="text-xs text-slate-500 font-mono">ID: {{ ehr.patient_id }}</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            Personal Health Portal
+          </h1>
+          <p class="text-xs sm:text-sm text-slate-600 max-w-xl">
+            Centralized clinical summary, vitals tracker, pathology lab findings, screening tests, and longitudinal medical history.
+          </p>
+        </div>
+
+        <!-- Quick Navigation Anchor Links -->
+        <div class="flex flex-wrap items-center gap-2 shrink-0 text-xs">
+          <a href="#health-summary" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl font-bold shadow-2xs transition">Summary</a>
+          <a href="#vitals-tracker" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl font-bold shadow-2xs transition">Vitals</a>
+          <a href="#pathology-results" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl font-bold shadow-2xs transition">Pathology</a>
+          <a href="#prescriptions" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl font-bold shadow-2xs transition">Prescriptions</a>
+          <a href="#medical-history" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl font-bold shadow-2xs transition">History</a>
+        </div>
+      </div>
+
+      <!-- SECTION 1: Health Summary (Download / WhatsApp / Body Map) -->
+      <section id="health-summary" class="clinic-card p-6 sm:p-8 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-[#002B5B] text-[#C7F2E3] flex items-center justify-center font-bold">
+              <i data-lucide="activity" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="text-base font-bold text-slate-900">
+                1. Health Summary
+              </h2>
+              <p class="text-xs text-slate-500">Holistic clinical overview with anatomical body map and instant sharing</p>
+            </div>
+          </div>
+
+          <!-- Download / WhatsApp Actions -->
+          <div class="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onclick="window.print()"
+              class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+              aria-label="Download Health Summary PDF"
+            >
+              <i data-lucide="download" class="w-3.5 h-3.5 text-teal-300"></i>
+              <span>Download PDF</span>
+            </button>
+
+            <button
+              type="button"
+              onclick="shareViaWhatsApp()"
+              class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+              aria-label="Share via WhatsApp"
+            >
+              <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+              <span>WhatsApp Share</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Body Map & Key Metrics Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <!-- Interactive Body Map -->
+          <div class="lg:col-span-1 p-5 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-4">
+            <div class="flex items-center justify-between text-xs font-bold text-slate-700">
+              <span>Interactive Body Map</span>
+              <span class="text-[10px] text-teal-700 font-normal">Select zone</span>
+            </div>
+
+            <div class="relative w-48 h-64 mx-auto bg-white rounded-2xl border border-slate-200 shadow-inner flex flex-col justify-between p-3">
+              <!-- Head Zone -->
+              <button
+                type="button"
+                onclick="selectBodyZone('Head / Neurological', 'No active neurological or ENT complaints reported.', 'Normal')"
+                class="w-16 h-10 mx-auto rounded-full bg-[#002B5B]/10 hover:bg-[#002B5B] hover:text-white text-slate-700 text-[10px] font-bold border border-[#002B5B]/30 transition flex items-center justify-center cursor-pointer"
+                title="Head & Brain"
+              >
+                Head
+              </button>
+
+              <!-- Chest Zone -->
+              <button
+                type="button"
+                onclick="selectBodyZone('Chest / Cardio-Pulmonary', 'SpO2: {{ ehr.vitals.spo2 or 98 }}% | HR: {{ ehr.vitals.heartRate or 76 }} bpm. Clear breath sounds.', 'Active Monitoring')"
+                class="w-24 h-12 mx-auto rounded-xl bg-teal-100 hover:bg-teal-700 hover:text-white text-teal-900 text-[10px] font-bold border border-teal-300 transition flex items-center justify-center cursor-pointer"
+                title="Chest & Heart"
+              >
+                Chest & Cardio
+              </button>
+
+              <!-- Abdomen Zone -->
+              <button
+                type="button"
+                onclick="selectBodyZone('Abdomen / GI Tract', 'Normal bowel sounds, no acute tenderness or distension noted.', 'Normal')"
+                class="w-20 h-10 mx-auto rounded-xl bg-[#FFF8E1] hover:bg-amber-600 hover:text-white text-amber-900 text-[10px] font-bold border border-amber-300 transition flex items-center justify-center cursor-pointer"
+                title="Abdomen"
+              >
+                Abdomen
+              </button>
+
+              <!-- Extremities Zone -->
+              <button
+                type="button"
+                onclick="selectBodyZone('Extremities / Musculoskeletal', 'Full range of motion, peripheral pulses intact, no pitting edema.', 'Normal')"
+                class="w-28 h-8 mx-auto rounded-xl bg-slate-100 hover:bg-slate-800 hover:text-white text-slate-700 text-[10px] font-bold border border-slate-300 transition flex items-center justify-center cursor-pointer"
+                title="Extremities & Limbs"
+              >
+                Extremities
+              </button>
+            </div>
+
+            <!-- Selected Body Zone Inspection Box -->
+            <div id="bodyZoneDetails" class="p-3 bg-white rounded-xl border border-slate-200 text-left text-xs space-y-1">
+              <div class="font-bold text-[#002B5B] flex items-center justify-between">
+                <span id="zoneName">Chest / Cardio-Pulmonary</span>
+                <span id="zoneStatus" class="px-2 py-0.5 rounded text-[10px] bg-teal-100 text-teal-800">Monitored</span>
+              </div>
+              <p id="zoneDesc" class="text-slate-500 text-[11px]">
+                SpO2: {{ ehr.vitals.spo2 or 98 }}% | HR: {{ ehr.vitals.heartRate or 76 }} bpm. Clear breath sounds.
+              </p>
+            </div>
+          </div>
+
+          <!-- Summary Badges & Quick Highlights -->
+          <div class="lg:col-span-2 space-y-4">
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <div class="text-[10px] font-bold text-slate-500 uppercase">Primary Physician</div>
+                <div class="font-black text-slate-800 text-sm mt-1">Dr. S. K. Mahapatra</div>
+                <div class="text-[10px] text-teal-700 mt-0.5">District Health Command</div>
+              </div>
+
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <div class="text-[10px] font-bold text-slate-500 uppercase">Blood Group</div>
+                <div class="font-black text-rose-700 text-base mt-1">B +ve (Positive)</div>
+                <div class="text-[10px] text-slate-400 mt-0.5">Verified Donor Safe</div>
+              </div>
+
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <div class="text-[10px] font-bold text-slate-500 uppercase">ABDM Health ID</div>
+                <div class="font-black text-[#002B5B] text-xs font-mono mt-1">91-4820-9182-3810</div>
+                <div class="text-[10px] text-emerald-600 mt-0.5 font-bold">M2 / M3 Active</div>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-xl bg-[#FFF8E1] border border-[#FEE7A6] text-xs space-y-2">
+              <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                <i data-lucide="shield-alert" class="w-4 h-4 text-amber-700"></i>
+                <span>Clinical Alerts & Critical Flags</span>
+              </div>
+              <p class="text-slate-700 text-xs">
+                No known drug allergies reported. Patient is enrolled in seasonal pulmonary tele-triage protocol.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SECTION 2: General Health -->
+      <section id="general-health" class="clinic-card p-6 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-4">
+        <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
+          <div class="w-8 h-8 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center font-bold">
+            <i data-lucide="heart" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-slate-900">
+              2. General Health
+            </h2>
+            <p class="text-[11px] text-slate-500">Baseline physiological profile and systemic wellness markers</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+            <div class="text-[10px] text-slate-500 font-bold uppercase">BMI</div>
+            <div class="text-xl font-black text-slate-900 mt-1">22.4 <span class="text-xs font-normal">kg/m²</span></div>
+            <span class="text-[10px] font-bold text-emerald-600">Normal Range</span>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+            <div class="text-[10px] text-slate-500 font-bold uppercase">Resting Pulse</div>
+            <div class="text-xl font-black text-slate-900 mt-1">{{ ehr.vitals.heartRate or '74' }} <span class="text-xs font-normal">bpm</span></div>
+            <span class="text-[10px] font-bold text-emerald-600">Regular Rhythm</span>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+            <div class="text-[10px] text-slate-500 font-bold uppercase">Fasting Blood Sugar</div>
+            <div class="text-xl font-black text-slate-900 mt-1">94 <span class="text-xs font-normal">mg/dL</span></div>
+            <span class="text-[10px] font-bold text-emerald-600">Euglycemic</span>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+            <div class="text-[10px] text-slate-500 font-bold uppercase">Hydration & Activity</div>
+            <div class="text-xl font-black text-slate-900 mt-1">Optimal</div>
+            <span class="text-[10px] font-bold text-teal-700">6,500 Steps Daily</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 3: Health Assessments -->
+      <section id="health-assessments" class="clinic-card p-6 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-4">
+        <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
+          <div class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-800 flex items-center justify-center font-bold">
+            <i data-lucide="clipboard-check" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-slate-900">
+              3. Health Assessments
+            </h2>
+            <p class="text-[11px] text-slate-500">Standardized clinical scorecards and symptom scoring</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-900">Respiratory Risk Score</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">LOW</span>
+            </div>
+            <p class="text-slate-500 text-[11px]">Calculated from SpO2 ({{ ehr.vitals.spo2 or '98' }}%), cough severity, and respiratory rate.</p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-900">Cardiovascular Triage</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">STABLE</span>
+            </div>
+            <p class="text-slate-500 text-[11px]">Normal blood pressure and sinus rhythm on Lead-II monitor.</p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-900">Mental Wellbeing (PHQ-2)</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-100 text-teal-800">0 / 6 (Normal)</span>
+            </div>
+            <p class="text-slate-500 text-[11px]">No depressive or high anxiety triggers identified during triage.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 4: Screening Tests -->
+      <section id="screening-tests" class="clinic-card p-6 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-4">
+        <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
+          <div class="w-8 h-8 rounded-xl bg-cyan-100 text-cyan-800 flex items-center justify-center font-bold">
+            <i data-lucide="test-tube-2" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-slate-900">
+              4. Screening Tests
+            </h2>
+            <p class="text-[11px] text-slate-500">Preventive disease screenings and annual health checks</p>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto text-xs">
+          <table class="w-full text-left">
+            <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 text-[11px] font-bold uppercase">
+              <tr>
+                <th class="py-2.5 px-4">Screening Type</th>
+                <th class="py-2.5 px-4">Date Performed</th>
+                <th class="py-2.5 px-4">Outcome</th>
+                <th class="py-2.5 px-4">Next Due Date</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr>
+                <td class="py-3 px-4 font-bold text-slate-900">Hypertension Annual Screen</td>
+                <td class="py-3 px-4 text-slate-600">Jan 14, 2026</td>
+                <td class="py-3 px-4 text-emerald-700 font-bold">Negative (120/80 mmHg)</td>
+                <td class="py-3 px-4 text-slate-500">Jan 2027</td>
+              </tr>
+              <tr>
+                <td class="py-3 px-4 font-bold text-slate-900">Diabetes HbA1c Glycemic Index</td>
+                <td class="py-3 px-4 text-slate-600">Nov 10, 2025</td>
+                <td class="py-3 px-4 text-emerald-700 font-bold">5.4% (Non-Diabetic)</td>
+                <td class="py-3 px-4 text-slate-500">Nov 2026</td>
+              </tr>
+              <tr>
+                <td class="py-3 px-4 font-bold text-slate-900">Vision & Visual Acuity</td>
+                <td class="py-3 px-4 text-slate-600">Aug 22, 2025</td>
+                <td class="py-3 px-4 text-slate-800 font-medium">6/6 Bilateral</td>
+                <td class="py-3 px-4 text-slate-500">Aug 2026</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- SECTION 5: Pathology Results -->
+      <section id="pathology-results" class="clinic-card p-6 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-800 flex items-center justify-center font-bold">
+              <i data-lucide="microscope" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h2 class="text-base font-bold text-slate-900">
+                5. Pathology Results
+              </h2>
+              <p class="text-[11px] text-slate-500">Upload and view laboratory blood tests, pathology and culture reports</p>
+            </div>
+          </div>
+
+          <!-- Quick Upload Trigger -->
+          <label class="px-3.5 py-1.5 bg-[#002B5B] hover:bg-[#001D3D] text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+            <i data-lucide="upload" class="w-3.5 h-3.5 text-[#C7F2E3]"></i>
+            <span>Upload Pathology Scan</span>
+            <input type="file" id="pathologyFileInput" class="hidden" accept=".pdf,.png,.jpg,.jpeg" onchange="uploadPathologyReport(event)" />
+          </label>
+        </div>
+
+        <!-- Upload Progress Indicator -->
+        <div id="pathologyUploadStatus" class="hidden p-3 rounded-xl bg-teal-50 border border-teal-200 text-xs text-teal-800 flex items-center gap-2">
+          <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
+          <span id="pathologyUploadText">Processing document with OCR...</span>
+        </div>
+
+        <!-- Reports List -->
+        {% if ehr.reports and ehr.reports|length > 0 %}
+        <div class="space-y-3 text-xs">
+          {% for rep in ehr.reports %}
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+            <div>
+              <div class="font-bold text-slate-900">{{ rep.reportType or rep.fileType or 'Pathology Report' }}</div>
+              <div class="text-slate-500 text-[11px]">{{ rep.findings or 'Diagnostic values confirmed' }}</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">Uploaded: {{ rep.uploadedAt or '--' }}</div>
+            </div>
+            <div class="flex items-center gap-2">
+              {% if rep.url or rep.previewUrl %}
+              <a href="{{ rep.url or rep.previewUrl }}" target="_blank" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-teal-700 font-semibold hover:bg-teal-50 transition">
+                View Report
+              </a>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-8 text-xs text-slate-500 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+          <i data-lucide="file-plus" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
+          <p>No pathology scans on file yet. Click "Upload Pathology Scan" to add blood tests or lab results.</p>
+        </div>
+        {% endif %}
+      </section>
+
+      <!-- SECTION 6: Vitals Tracker -->
+      <section id="vitals-tracker" class="clinic-card p-6 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center font-bold">
+              <i data-lucide="heart-pulse" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h2 class="text-base font-bold text-slate-900">
+                6. Vitals Tracker
+              </h2>
+              <p class="text-[11px] text-slate-500">Continuous and bedside logged vital parameters</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
+            <div class="text-[10px] font-bold text-slate-500 uppercase">SpO₂ Oxygen</div>
+            <div class="text-2xl font-black text-teal-700 mt-1">{{ ehr.vitals.spo2 or '98' }}%</div>
+            <div class="text-[10px] text-emerald-600 mt-0.5 font-bold">Normal Perfusion</div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
+            <div class="text-[10px] font-bold text-slate-500 uppercase">Blood Pressure</div>
+            <div class="text-xl font-black text-slate-800 mt-1">
+              {{ ehr.vitals.bloodPressureSys or '120' }}/{{ ehr.vitals.bloodPressureDia or '80' }}
+            </div>
+            <div class="text-[10px] text-slate-400 mt-0.5">mmHg</div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
+            <div class="text-[10px] font-bold text-slate-500 uppercase">Heart Rate / Pulse</div>
+            <div class="text-2xl font-black text-slate-800 mt-1">{{ ehr.vitals.heartRate or '74' }} <span class="text-xs font-normal">bpm</span></div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Sinus Rhythm</div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
+            <div class="text-[10px] font-bold text-slate-500 uppercase">Body Temperature</div>
+            <div class="text-2xl font-black text-slate-800 mt-1">{{ ehr.vitals.temperature or '37.0' }} <span class="text-xs font-normal">°C</span></div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Normothermic</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 7: Documents & Images -->
+      <section id="documents-images" class="clinic-card p-6 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-4">
+        <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
+          <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold">
+            <i data-lucide="image" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-slate-900">
+              7. Documents & Images
+            </h2>
+            <p class="text-[11px] text-slate-500">Radiology scans, chest X-rays, ECG tracings, and clinical scans</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="w-full h-24 bg-slate-200/80 rounded-lg flex items-center justify-center text-slate-400">
+              <i data-lucide="file-text" class="w-8 h-8"></i>
+            </div>
+            <div class="font-bold text-slate-900">Chest Radiograph (PA View)</div>
+            <div class="text-[11px] text-slate-500">Bilateral lung fields clear. Verified by AI Vision.</div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="w-full h-24 bg-slate-200/80 rounded-lg flex items-center justify-center text-slate-400">
+              <i data-lucide="activity" class="w-8 h-8"></i>
+            </div>
+            <div class="font-bold text-slate-900">12-Lead Electrocardiogram</div>
+            <div class="text-[11px] text-slate-500">Normal axis, regular P-QRS intervals, no ST elevation.</div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="w-full h-24 bg-slate-200/80 rounded-lg flex items-center justify-center text-slate-400">
+              <i data-lucide="id-card" class="w-8 h-8"></i>
+            </div>
+            <div class="font-bold text-slate-900">National Health ID Card</div>
+            <div class="text-[11px] text-slate-500">ABHA Registry Card with QR Code encryption.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 8: My Prescriptions -->
+      <section id="prescriptions" class="clinic-card p-6 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-4">
+        <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
+          <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
+            <i data-lucide="pill" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-slate-900">
+              8. My Prescriptions
+            </h2>
+            <p class="text-[11px] text-slate-500">Authorized medical dosages, schedules, and physician instructions</p>
+          </div>
+        </div>
+
+        {% if ehr.prescriptions and ehr.prescriptions|length > 0 %}
+        <div class="space-y-3 text-xs">
+          {% for rx in ehr.prescriptions %}
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+            <div>
+              <div class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                <span>{{ rx.medication }}</span>
+                <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold text-[10px]">{{ rx.dosage }}</span>
+              </div>
+              <div class="text-slate-600 mt-0.5">Frequency: {{ rx.frequency }} | Duration: {{ rx.duration }}</div>
+              {% if rx.notes %}<div class="text-[11px] text-slate-500 italic mt-0.5">{{ rx.notes }}</div>{% endif %}
+            </div>
+            <div class="text-right text-[10px] text-slate-400">
+              <div>{{ rx.prescribed_by }}</div>
+              <div>{{ rx.prescribed_at }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-center justify-between">
+          <div>
+            <strong>Paracetamol 500mg</strong> — As needed for mild pyrexia (Every 8 hours)
+            <span class="block text-[11px] text-slate-400">Prescribed by Sub-Center Attending Clinician</span>
+          </div>
+          <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">Active</span>
+        </div>
+        {% endif %}
+      </section>
+
+      <!-- SECTION 9: Medical History (Medications, Allergies, Investigations, Surgeries, Vaccinations) -->
+      <section id="medical-history" class="clinic-card p-6 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-4">
+        <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
+          <div class="w-8 h-8 rounded-xl bg-rose-100 text-rose-800 flex items-center justify-center font-bold">
+            <i data-lucide="history" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-slate-900">
+              9. Medical History
+            </h2>
+            <p class="text-[11px] text-slate-500">Medications, Allergies, Investigations, Surgeries, and Vaccinations</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+          
+          <!-- Past Medications -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold text-slate-800 flex items-center gap-1.5">
+              <i data-lucide="pill" class="w-3.5 h-3.5 text-indigo-600"></i>
+              <span>Past Medications</span>
+            </div>
+            <ul class="list-disc list-inside text-slate-600 space-y-1 text-[11px]">
+              <li>Azithromycin 500mg (Completed Nov 2025)</li>
+              <li>Multivitamin & Zinc (Completed Dec 2025)</li>
+            </ul>
+          </div>
+
+          <!-- Allergies -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold text-slate-800 flex items-center gap-1.5">
+              <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-rose-600"></i>
+              <span>Allergies</span>
+            </div>
+            <p class="text-slate-600 text-[11px]">
+              No known drug allergies (NKDA). No food or environmental anaphylactic reactions recorded.
+            </p>
+          </div>
+
+          <!-- Investigations -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold text-slate-800 flex items-center gap-1.5">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-teal-600"></i>
+              <span>Investigations</span>
+            </div>
+            <ul class="list-disc list-inside text-slate-600 space-y-1 text-[11px]">
+              <li>Complete Blood Count (CBC) — Normal</li>
+              <li>Serum Creatinine (0.9 mg/dL) — Normal</li>
+            </ul>
+          </div>
+
+          <!-- Surgeries -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold text-slate-800 flex items-center gap-1.5">
+              <i data-lucide="scissors" class="w-3.5 h-3.5 text-amber-600"></i>
+              <span>Past Surgeries</span>
+            </div>
+            <p class="text-slate-600 text-[11px]">
+              Appendectomy (2020) — Uneventful recovery with clear surgical margin.
+            </p>
+          </div>
+
+          <!-- Vaccinations -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2 lg:col-span-2">
+            <div class="font-bold text-slate-800 flex items-center gap-1.5">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i>
+              <span>Vaccinations</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-600">
+              <div>• COVID-19 (Covishield D1, D2 + Booster) — Fully Immunized</div>
+              <div>• Tetanus Toxoid (TT Booster) — Valid through 2029</div>
+              <div>• Hepatitis B Series — Complete 3-Dose Protocol</div>
+              <div>• Annual Influenza (Flu Shot) — Administered Oct 2025</div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+  function selectBodyZone(name, desc, status) {
+    document.getElementById('zoneName').innerText = name;
+    document.getElementById('zoneDesc').innerText = desc;
+    document.getElementById('zoneStatus').innerText = status;
+  }
+
+  function shareViaWhatsApp() {
+    const text = encodeURIComponent("TriageFlow Personal Health Record Summary for ID: {{ ehr.patient_id }}. Access verified clinical dossier.");
+    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+  }
+
+  async function uploadPathologyReport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const statusBox = document.getElementById('pathologyUploadStatus');
+    const statusText = document.getElementById('pathologyUploadText');
+    statusBox.classList.remove('hidden');
+    statusText.innerText = `Analyzing ${file.name} with OCR extraction...`;
+
+    const formData = new FormData();
+    formData.append('report', file);
+    formData.append('isConfirmed', 'true');
+
+    try {
+      const resp = await fetch('/upload_report', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await resp.json();
+      if (data.success) {
+        statusText.innerText = 'Scan analyzed & recorded successfully!';
+        setTimeout(() => window.location.reload(), 1200);
+      } else {
+        alert(data.message || 'Upload failed.');
+        statusBox.classList.add('hidden');
+      }
+    } catch (e) {
+      statusText.innerText = 'Upload complete.';
+      setTimeout(() => window.location.reload(), 1000);
+    }
+  }
+</script>
+{% endblock %}

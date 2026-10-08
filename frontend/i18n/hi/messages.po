@@ -1,0 +1,73 @@
+# Hindi translations for Healthcare Triage Platform.
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-22 20:00+0530\n"
+"PO-Revision-Date: 2026-09-22 20:00+0530\n"
+"Last-Translator: Informatics Team\n"
+"Language-Team: Hindi\n"
+"Language: hi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Home"
+msgstr "होम"
+
+msgid "Clinical Safety"
+msgstr "क्लिनिकल सुरक्षा"
+
+msgid "Your Health Record"
+msgstr "आपका स्वास्थ्य रिकॉर्ड"
+
+msgid "Telecare"
+msgstr "टेलीकेयर परामर्श"
+
+msgid "Testimonials"
+msgstr "समीक्षाएं व अनुभव"
+
+msgid "Franchise Info"
+msgstr "फ्रैंचाइज़ी व क्लिनिक नेटवर्क"
+
+msgid "Case Directory"
+msgstr "केस सूची"
+
+msgid "Dashboard"
+msgstr "डैशबोर्ड"
+
+msgid "Sign In"
+msgstr "साइन इन"
+
+msgid "Register"
+msgstr "पंजीकरण करें"
+
+msgid "Sign Out"
+msgstr "लॉग आउट"
+
+msgid "Start New Intake"
+msgstr "नया मरीज भर्ती करें"
+
+msgid "Self-Admission"
+msgstr "स्वयं भर्ती आवेदन"
+
+msgid "Multimodal AI-Assisted Healthcare Triage"
+msgstr "मल्टीमॉडल एआई-सहायता प्राप्त स्वास्थ्य परीक्षण"
+
+msgid "From Patient Voice to Doctor-Ready Information"
+msgstr "मरीज की आवाज से डॉक्टर-तैयार नैदानिक जानकारी"
+
+msgid "Patient ID"
+msgstr "रोगी पहचान (आईडी)"
+
+msgid "Vitals Telemetry"
+msgstr "लाइव वाइटल्स टेलीमेट्री"
+
+msgid "AI Diet Consultation"
+msgstr "एआई आहार व पोषण परामर्श"
+
+msgid "Generate Secure Share Link"
+msgstr "सुरक्षित शेयर लिंक बनाएं"
+
+msgid "Healthcare Triage"
+msgstr "स्वास्थ्य ट्राइएज"

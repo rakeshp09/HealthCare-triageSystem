@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Facility Contact & Clinical Support - TriageFlow{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-12 space-y-8">
+  <div class="text-center max-w-2xl mx-auto">
+    <span class="text-xs font-bold uppercase tracking-wider text-teal-700 bg-teal-50 px-3 py-1 rounded-full border border-teal-200">
+      Command & Clinical Support
+    </span>
+    <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight mt-3">
+      Facility Directory & Clinical Support
+    </h1>
+    <p class="text-xs text-slate-600 mt-2">
+      Contact the District Health Informatics Command or submit feedback regarding triage operations.
+    </p>
+  </div>
+
+  {% if success_msg %}
+  <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-800 flex items-center gap-2">
+    <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 shrink-0"></i>
+    <span>{{ success_msg }}</span>
+  </div>
+  {% endif %}
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Contact Form -->
+    <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
+      <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">
+        Submit Clinical Feedback
+      </h3>
+      <form method="POST" action="{{ url_for('frontend.contact') }}" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 uppercase mb-1">Your Name</label>
+          <input
+            type="text"
+            name="name"
+            required
+            value="{{ user.name if user else '' }}"
+            placeholder="e.g. Dr. K. S. Raman"
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-teal-500 outline-none"
+          />
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 uppercase mb-1">Email</label>
+          <input
+            type="email"
+            name="email"
+            required
+            value="{{ user.email if user else '' }}"
+            placeholder="e.g. dr.raman@triageflow.org"
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-teal-500 outline-none"
+          />
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 uppercase mb-1">Message / Clinical Query</label>
+          <textarea
+            name="message"
+            rows="4"
+            required
+            placeholder="Provide comments regarding triage workflow, translation fidelity, or system priority adjustments..."
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-teal-500 outline-none"
+          ></textarea>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full py-2.5 bg-teal-700 hover:bg-teal-800 text-white font-semibold rounded-xl transition shadow-xs cursor-pointer"
+        >
+          Submit Inquiry
+        </button>
+      </form>
+    </div>
+
+    <!-- Facility & Command Directory -->
+    <div class="space-y-4">
+      <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3 text-xs">
+        <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">
+          District Command Center
+        </h3>
+        <p class="text-slate-600">
+          <strong>District Health Informatics Command</strong><br />
+          Room 402, District Civil Hospital Administrative Block<br />
+          Helpline: +91 11 2345 6789<br />
+          Email: <span class="font-mono text-teal-700">informatics@triageflow.org</span>
+        </p>
+      </div>
+
+      <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3 text-xs">
+        <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">
+          Triage Unit & Primary Facility
+        </h3>
+        <p class="text-slate-600">
+          <strong>Community Health Center & Triage Unit</strong><br />
+          Emergency Handoff Wing, Ward 4<br />
+          Direct Dispatch: +91 11 9876 5432<br />
+          Email: <span class="font-mono text-teal-700">emergency.triage@districthospital.gov.in</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

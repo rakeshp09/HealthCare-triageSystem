@@ -1,0 +1,73 @@
+# English translations for Healthcare Triage Platform.
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-22 20:00+0530\n"
+"PO-Revision-Date: 2026-09-22 20:00+0530\n"
+"Last-Translator: Informatics Team\n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Home"
+msgstr "Home"
+
+msgid "Clinical Safety"
+msgstr "Clinical Safety"
+
+msgid "Your Health Record"
+msgstr "Your Health Record"
+
+msgid "Telecare"
+msgstr "Telecare"
+
+msgid "Testimonials"
+msgstr "Testimonials"
+
+msgid "Franchise Info"
+msgstr "Franchise Info"
+
+msgid "Case Directory"
+msgstr "Case Directory"
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "Sign In"
+msgstr "Sign In"
+
+msgid "Register"
+msgstr "Register"
+
+msgid "Sign Out"
+msgstr "Sign Out"
+
+msgid "Start New Intake"
+msgstr "Start New Intake"
+
+msgid "Self-Admission"
+msgstr "Self-Admission"
+
+msgid "Multimodal AI-Assisted Healthcare Triage"
+msgstr "Multimodal AI-Assisted Healthcare Triage"
+
+msgid "From Patient Voice to Doctor-Ready Information"
+msgstr "From Patient Voice to Doctor-Ready Information"
+
+msgid "Patient ID"
+msgstr "Patient ID"
+
+msgid "Vitals Telemetry"
+msgstr "Vitals Telemetry"
+
+msgid "AI Diet Consultation"
+msgstr "AI Diet Consultation"
+
+msgid "Generate Secure Share Link"
+msgstr "Generate Secure Share Link"
+
+msgid "Healthcare Triage"
+msgstr "Healthcare Triage"

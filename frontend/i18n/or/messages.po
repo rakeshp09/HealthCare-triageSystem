@@ -1,0 +1,73 @@
+# Odia translations for Healthcare Triage Platform.
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-22 20:00+0530\n"
+"PO-Revision-Date: 2026-09-22 20:00+0530\n"
+"Last-Translator: Informatics Team\n"
+"Language-Team: Odia\n"
+"Language: or\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Home"
+msgstr "ମୂଳପୃଷ୍ଠା"
+
+msgid "Clinical Safety"
+msgstr "ଡାକ୍ତରୀ ସୁରକ୍ଷା"
+
+msgid "Your Health Record"
+msgstr "ଆପଣଙ୍କ ସ୍ୱାସ୍ଥ୍ୟ ରେକର୍ଡ"
+
+msgid "Telecare"
+msgstr "ଟେଲିକେୟାର ପରାମର୍ଶ"
+
+msgid "Testimonials"
+msgstr "ରୋଗୀଙ୍କ ଅନୁଭୂତି"
+
+msgid "Franchise Info"
+msgstr "ଫ୍ରାଞ୍ଚାଇଜ୍ ଓ ଉପକେନ୍ଦ୍ର"
+
+msgid "Case Directory"
+msgstr "ରୋଗୀ ତାଲିକା"
+
+msgid "Dashboard"
+msgstr "ଡ୍ୟାସବୋର୍ଡ"
+
+msgid "Sign In"
+msgstr "ଲଗ୍-ଇନ୍"
+
+msgid "Register"
+msgstr "ପଞ୍ଜୀକରଣ"
+
+msgid "Sign Out"
+msgstr "ଲଗ୍-ଆଉଟ୍"
+
+msgid "Start New Intake"
+msgstr "ନୂତନ ରୋଗୀ ଯୋଗ କରନ୍ତୁ"
+
+msgid "Self-Admission"
+msgstr "ସ୍ୱୟଂ ଭର୍ତ୍ତି ଆବେଦନ"
+
+msgid "Multimodal AI-Assisted Healthcare Triage"
+msgstr "ଏଆଇ-ଚାଳିତ ମଲ୍ଟିମୋଡାଲ ସ୍ୱାସ୍ଥ୍ୟ ପରୀକ୍ଷା"
+
+msgid "From Patient Voice to Doctor-Ready Information"
+msgstr "ରୋଗୀଙ୍କ କଥାରୁ ଡାକ୍ତର-ପ୍ରସ୍ତୁତ ଚିକିତ୍ସା ତଥ୍ୟ"
+
+msgid "Patient ID"
+msgstr "ରୋଗୀ ପରିଚୟ (ଆଇଡି)"
+
+msgid "Vitals Telemetry"
+msgstr "ପ୍ରତ୍ୟକ୍ଷ ଭାଇଟାଲ୍ସ ଟେଲିମେଟ୍ରି"
+
+msgid "AI Diet Consultation"
+msgstr "ଏଆଇ ପୁଷ୍ଟିସାର ଓ ଖାଦ୍ୟ ପରାମର୍ଶ"
+
+msgid "Generate Secure Share Link"
+msgstr "ସୁରକ୍ଷିତ ଲିଙ୍କ ପ୍ରସ୍ତୁତ କରନ୍ତୁ"
+
+msgid "Healthcare Triage"
+msgstr "ସ୍ୱାସ୍ଥ୍ୟ ଟ୍ରାଇଏଜ୍"

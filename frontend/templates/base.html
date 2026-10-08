@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="{{ session.get('lang', 'en') }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}TriageFlow - Multimodal Healthcare Triage & Handoff{% endblock %}</title>
+  
+  <!-- Google Fonts: Inter & Noto Sans Devanagari (Bilingual Typography) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans Devanagari', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          },
+          colors: {
+            clinicBlue: '#002B5B',
+            clinicBlueHover: '#001D3D',
+            clinicMint: '#C7F2E3',
+            clinicBeige: '#FFF8E1',
+            clinicPastel: '#F8FAFC',
+            teal: {
+              50: '#f0fdfa',
+              100: '#ccfbf1',
+              200: '#99f6e4',
+              300: '#5eead4',
+              400: '#2dd4bf',
+              500: '#14b8a6',
+              600: '#0d9488',
+              700: '#0f766e',
+              800: '#115e59',
+              900: '#134e4a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js for Smart IoT Telemetry -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- SweetAlert2 for Toast and Notifications -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- ClinicWala-Inspired Custom Design System -->
+  <link rel="stylesheet" href="{{ url_for('frontend.static', filename='css/style.css') }}">
+</head>
+<body class="medical-cross-pattern text-slate-900 min-h-screen flex flex-col antialiased">
+  
+  <!-- Sticky Header / Navbar -->
+  <header class="sticky top-0 z-50 bg-white border-b border-slate-100 shadow-xs print:hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Left: Brand Logo & Title -->
+        <div class="flex items-center gap-3">
+          <a href="{{ url_for('frontend.home') }}" class="flex items-center gap-2.5 group">
+            <div class="w-9 h-9 rounded-xl bg-[#002B5B] text-[#C7F2E3] flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
+              <i data-lucide="activity" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <span class="font-extrabold text-base tracking-tight text-slate-900 flex items-center gap-1.5">
+                TriageFlow
+                <span class="text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200">
+                  ABDM Ready
+                </span>
+              </span>
+            </div>
+          </a>
+        </div>
+
+        <!-- Center: Simple & Centered Navigation (Home, About, Login, Register) -->
+        <nav class="hidden md:flex items-center justify-center gap-8 text-sm font-semibold text-slate-700" aria-label="Main Navigation">
+          <a href="{{ url_for('frontend.home') }}" class="hover:text-[#002B5B] transition">
+            Home
+          </a>
+          <a href="{{ url_for('frontend.about') }}" class="hover:text-[#002B5B] transition">
+            About
+          </a>
+          {% if not user %}
+          <a href="{{ url_for('auth.login_view') }}" class="hover:text-[#002B5B] transition">
+            Login
+          </a>
+          <a href="{{ url_for('auth.signup_view') }}" class="px-4 py-2 bg-[#002B5B] hover:bg-[#001D3D] text-white rounded-xl font-bold shadow-xs transition hover:-translate-y-0.5">
+            Register
+          </a>
+          {% endif %}
+        </nav>
+
+        <!-- Right: Authenticated User Pill or Mobile Actions -->
+        <div class="flex items-center gap-3">
+          {% if user %}
+          <!-- Authenticated User Profile Pill -->
+          <div class="flex items-center gap-2">
+            <a href="{{ url_for('frontend.profile_page') }}" class="flex items-center gap-2.5 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-2xl shadow-2xs text-xs transition">
+              <div class="w-6 h-6 rounded-lg bg-[#002B5B] text-[#C7F2E3] flex items-center justify-center font-bold text-[10px]">
+                {{ user.name[:2]|upper if user.name else 'TF' }}
+              </div>
+              <div class="text-left leading-tight hidden sm:block">
+                <span class="font-bold text-slate-800 block truncate max-w-[120px]">
+                  {{ user.name }}
+                </span>
+                <span class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">
+                  {{ user.role }}
+                </span>
+              </div>
+            </a>
+
+            <a
+              href="{{ url_for('backend.logout_view') }}"
+              class="flex items-center gap-1.5 p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition border border-transparent hover:border-rose-100 cursor-pointer text-xs font-semibold"
+              title="Sign Out"
+            >
+              <i data-lucide="log-out" class="w-4 h-4"></i>
+              <span class="hidden md:inline">Sign Out</span>
+            </a>
+          </div>
+          {% else %}
+          <div class="flex md:hidden items-center gap-2">
+            <a
+              href="{{ url_for('auth.login_view') }}"
+              class="px-3 py-1.5 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-lg"
+            >
+              Login
+            </a>
+            <a
+              href="{{ url_for('auth.signup_view') }}"
+              class="px-3 py-1.5 text-xs font-bold text-white bg-[#002B5B] rounded-lg"
+            >
+              Register
+            </a>
+          </div>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Flash Messages Container -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 print:hidden">
+    {% for category, message in messages %}
+    {% if message and message|lower not in ['unauthorized', 'none', '', 'auth_required', 'forbidden'] %}
+    <div class="p-3.5 rounded-2xl text-xs flex items-center justify-between {% if category == 'error' %}bg-rose-50 border border-rose-200 text-rose-800{% else %}bg-teal-50 border border-teal-200 text-teal-800{% endif %} shadow-xs">
+      <div class="flex items-center gap-2">
+        <i data-lucide="info" class="w-4 h-4 shrink-0"></i>
+        <span class="font-medium">{{ message }}</span>
+      </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
+
+  <!-- Main Body Content -->
+  <main class="flex-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer with Trust Badges -->
+  <footer class="mt-auto bg-white border-t border-slate-100 py-10 print:hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Top Trust Badges Row -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pb-8 mb-8 border-b border-slate-100 text-center">
+        <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100">
+          <div class="w-8 h-8 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center mx-auto mb-2">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+          </div>
+          <div class="font-bold text-xs text-slate-800">Secure & Encrypted</div>
+          <div class="text-[10px] text-slate-500">Clinical Data Privacy</div>
+        </div>
+
+        <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100">
+          <div class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-800 flex items-center justify-center mx-auto mb-2">
+            <i data-lucide="stethoscope" class="w-4 h-4"></i>
+          </div>
+          <div class="font-bold text-xs text-slate-800">100% Doctor Sign-Off</div>
+          <div class="text-[10px] text-slate-500">Human-in-the-Loop Safe</div>
+        </div>
+
+        <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100">
+          <div class="w-8 h-8 rounded-xl bg-cyan-100 text-cyan-800 flex items-center justify-center mx-auto mb-2">
+            <i data-lucide="languages" class="w-4 h-4"></i>
+          </div>
+          <div class="font-bold text-xs text-slate-800">Multilingual Voice</div>
+          <div class="text-[10px] text-slate-500">Hindi, Odia & Indian Langs</div>
+        </div>
+
+        <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100">
+          <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto mb-2">
+            <i data-lucide="lock" class="w-4 h-4"></i>
+          </div>
+          <div class="font-bold text-xs text-slate-800">Encrypted Token Sharing</div>
+          <div class="text-[10px] text-slate-500">Expiring EHR Access Links</div>
+        </div>
+      </div>
+
+      <!-- Policy & Legal Navigation Row (English Only) -->
+      <div class="py-4 border-b border-slate-100 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate-500 font-medium">
+        <a href="{{ url_for('frontend.about') }}" class="hover:text-[#002B5B] transition">Privacy Policy</a>
+        <span class="text-slate-300">•</span>
+        <a href="{{ url_for('frontend.about') }}" class="hover:text-[#002B5B] transition">Terms & Conditions</a>
+        <span class="text-slate-300">•</span>
+        <a href="{{ url_for('frontend.about') }}" class="hover:text-[#002B5B] transition">Refund Policy</a>
+        <span class="text-slate-300">•</span>
+        <a href="{{ url_for('frontend.about') }}" class="hover:text-[#002B5B] transition">Shipping & Delivery Policy</a>
+        <span class="text-slate-300">•</span>
+        <a href="{{ url_for('frontend.about') }}" class="hover:text-[#002B5B] transition">Our Services</a>
+        <span class="text-slate-300">•</span>
+        <a href="{{ url_for('frontend.about') }}" class="hover:text-[#002B5B] transition">About Us</a>
+        <span class="text-slate-300">•</span>
+        <a href="{{ url_for('frontend.contact') }}" class="hover:text-[#002B5B] transition">Contact Us</a>
+      </div>
+
+      <!-- Bottom Credits -->
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500 pt-6">
+        <div class="flex items-center gap-2.5">
+          <div class="w-7 h-7 rounded-xl bg-[#002B5B] text-white flex items-center justify-center font-bold shadow-xs">
+            <i data-lucide="activity" class="w-4 h-4 text-[#C7F2E3]"></i>
+          </div>
+          <span class="font-bold text-slate-800">TriageFlow</span>
+          <span>— Multimodal Healthcare Triage, EHR & Connected Telecare</span>
+        </div>
+        <div class="flex items-center gap-6">
+          <a href="{{ url_for('frontend.about') }}" class="hover:text-[#002B5B] transition">Clinical Safety Principle</a>
+          <a href="{{ url_for('frontend.contact') }}" class="hover:text-[#002B5B] transition">Emergency Contacts</a>
+          <span class="text-slate-400 font-mono text-[11px]">ABDM Compliant M2/M3</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Application JS -->
+  <script src="{{ url_for('frontend.static', filename='js/upload.js') }}"></script>
+  <script src="{{ url_for('frontend.static', filename='js/app.js') }}"></script>
+  <script>
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+  </script>
+</body>
+</html>

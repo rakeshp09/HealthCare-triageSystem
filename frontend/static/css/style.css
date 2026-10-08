@@ -1,0 +1,262 @@
+/* ==========================================================================
+   ClinicWala-Inspired Modern Healthcare Design System
+   Color Palette: Deep Blue (#002B5B), Mint Green (#C7F2E3), Light Beige (#FFF8E1), Soft Pastel (#F8FAFC)
+   Typography: Inter (English) + Noto Sans Devanagari (Hindi)
+   ========================================================================== */
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  
+  /* ClinicWala Color Palette */
+  --clinic-blue: #002B5B;
+  --clinic-blue-hover: #001D3D;
+  --clinic-blue-light: #0A3D78;
+  --clinic-mint: #C7F2E3;
+  --clinic-mint-dark: #0d9488;
+  --clinic-beige: #FFF8E1;
+  --clinic-beige-border: #FEE7A6;
+  --clinic-pastel: #F8FAFC;
+
+  --primary-teal: #0f766e;
+  --primary-teal-light: #14b8a6;
+  --primary-teal-dark: #115e59;
+  --accent-cyan: #06b6d4;
+  --accent-indigo: #4f46e5;
+  --card-bg: #ffffff;
+  --card-border: #f1f5f9;
+}
+
+/* Base Body Styling with Inter & Noto Sans Devanagari */
+body {
+  background-color: var(--clinic-pastel);
+  color: var(--foreground);
+  font-family: 'Inter', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* Medical Cross Pattern Background */
+.medical-cross-pattern {
+  background-color: #F8FAFC;
+  background-image: 
+    radial-gradient(rgba(0, 43, 91, 0.035) 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg width='36' height='36' viewBox='0 0 36 36' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M16 8h4v20h-4zM8 16h20v4h-20z' fill='%23002B5B' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+  background-size: 24px 24px, 48px 48px;
+}
+
+/* Deep Blue ClinicWala Primary Button */
+.btn-clinic-primary {
+  background-color: var(--clinic-blue);
+  color: #ffffff;
+  font-weight: 700;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 14px 0 rgba(0, 43, 91, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.btn-clinic-primary:hover {
+  background-color: var(--clinic-blue-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px 0 rgba(0, 43, 91, 0.35);
+}
+
+.btn-clinic-primary:active {
+  transform: translateY(0);
+}
+
+/* Mint Accent Button & Cards */
+.btn-clinic-mint {
+  background-color: var(--clinic-mint);
+  color: #002B5B;
+  font-weight: 700;
+  border: 1px solid rgba(15, 118, 110, 0.2);
+  transition: all 0.2s ease;
+}
+
+.btn-clinic-mint:hover {
+  background-color: #b2ebd7;
+  transform: translateY(-1.5px);
+}
+
+/* Smooth Gradient Backgrounds */
+.bg-clinic-gradient {
+  background: linear-gradient(135deg, #f0fdfa 0%, #ecfeff 50%, #ffffff 100%);
+}
+
+.bg-teal-gradient {
+  background: linear-gradient(135deg, #002B5B 0%, #0f766e 60%, #0891b2 100%);
+}
+
+.bg-card-gradient {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.bg-glow-gradient {
+  background: radial-gradient(circle at top right, rgba(199, 242, 227, 0.35), transparent 60%);
+}
+
+/* Glassmorphism & Elevated Cards */
+.clinic-card {
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.04), 0 2px 4px -2px rgba(15, 23, 42, 0.03);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.clinic-card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 28px -10px rgba(0, 43, 91, 0.12), 0 4px 6px -2px rgba(15, 23, 42, 0.04);
+  border-color: rgba(0, 43, 91, 0.25);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 8px 32px 0 rgba(0, 43, 91, 0.06);
+}
+
+/* Sidebar Navigation Component */
+.clinic-sidebar {
+  background: #ffffff;
+  border-right: 1px solid #e2e8f0;
+}
+
+.clinic-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.95rem;
+  border-radius: 0.85rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #475569;
+  transition: all 0.18s ease;
+}
+
+.clinic-sidebar-link:hover {
+  background-color: #f1f5f9;
+  color: #002B5B;
+  transform: translateX(2px);
+}
+
+.clinic-sidebar-link.active {
+  background-color: #002B5B;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 43, 91, 0.2);
+}
+
+.clinic-sidebar-link.active svg {
+  color: #C7F2E3;
+}
+
+/* Live Telemetry Pulse Animation */
+@keyframes pulse-live {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.live-badge-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #10b981;
+  border-radius: 50%;
+  animation: pulse-live 1.8s infinite;
+}
+
+/* Custom Scrollbar for Clinical Feeds */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Interactive Pill Badges */
+.badge-clinic {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+
+.badge-clinic-blue {
+  background-color: #e0f2fe;
+  color: #002B5B;
+  border: 1px solid #bae6fd;
+}
+
+.badge-clinic-mint {
+  background-color: #C7F2E3;
+  color: #064e3b;
+  border: 1px solid #a7f3d0;
+}
+
+.badge-clinic-beige {
+  background-color: #FFF8E1;
+  color: #854d0e;
+  border: 1px solid #fef08a;
+}
+
+.badge-clinic-teal {
+  background-color: #ccfbf1;
+  color: #115e59;
+  border: 1px solid #99f6e4;
+}
+
+/* Subtle Shimmer for AI Processing */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer-ai {
+  background: linear-gradient(90deg, #f0fdfa 25%, #ccfbf1 50%, #f0fdfa 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2.2s infinite;
+}
+
+/* Accessible Modal Transitions */
+.modal-enter {
+  opacity: 0;
+  transform: scale(0.96);
+}
+.modal-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Keyboard focus indicators */
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid #002B5B;
+  outline-offset: 2px;
+}
+
+/* Print Rules for Standardized 15-Section Handoff Dossier */
+@media print {
+  @page { margin: 12mm 15mm; size: A4 portrait; }
+  body { background: #ffffff !important; color: #0f172a !important; font-size: 11pt !important; }
+  .print\:hidden { display: none !important; }
+  .print-page-break { page-break-before: always; }
+  .print-packet { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
+}

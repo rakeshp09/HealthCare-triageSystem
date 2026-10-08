@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Initiate Specialist Referral - #{{ case.patientId }} - TriageFlow{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+  <!-- Header -->
+  <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-xs font-bold uppercase tracking-wider text-sky-700 bg-sky-50 px-2.5 py-0.5 rounded border border-sky-200 flex items-center gap-1">
+          <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+          Specialist Clinical Referral
+        </span>
+        <span class="text-xs text-slate-400">•</span>
+        <span class="text-xs text-slate-500 font-mono">Case #{{ case.patientId }}</span>
+      </div>
+      <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">
+        Initiate Clinical Specialist Referral
+      </h1>
+      <p class="text-xs text-slate-500 mt-0.5">
+        Referrals are only generated after qualified physician evaluation and decision sign-off.
+      </p>
+    </div>
+
+    <span class="px-3 py-1 rounded-full text-xs font-bold {% if case.priority == 'HIGH' %}bg-rose-100 text-rose-800 border border-rose-200{% else %}bg-amber-100 text-amber-800 border border-amber-200{% endif %}">
+      {{ case.priority }} PRIORITY
+    </span>
+  </div>
+
+  <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+    <!-- Patient Case Summary Banner -->
+    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-1">
+      <div class="font-bold text-slate-900">Patient: {{ case.patientId }} ({{ case.age }}Y / {{ case.gender }})</div>
+      <div><strong>Chief Complaint:</strong> {{ case.chiefConcern }}</div>
+      <div><strong>Physical Vitals:</strong> SpO2: <span class="text-rose-600 font-bold">{{ (case.vitals or {}).get('spo2', '--') }}%</span>, Temp: {{ (case.vitals or {}).get('temperature', '--') }}°C, BP: {{ (case.vitals or {}).get('bloodPressureSys', '--') }}/{{ (case.vitals or {}).get('bloodPressureDia', '--') }} mmHg</div>
+    </div>
+
+    <form id="referralForm" onsubmit="submitReferralAction(event)" class="space-y-4 text-xs">
+      <div>
+        <label class="block font-bold text-slate-700 uppercase mb-1">Destination Facility</label>
+        <input
+          type="text"
+          id="destFacilityInput"
+          required
+          value="{{ (case.referral or {}).get('destinationFacility') or 'District Civil Hospital & Medical College' }}"
+          class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-sky-500 outline-none"
+        />
+      </div>
+
+      <div>
+        <label class="block font-bold text-slate-700 uppercase mb-1">Destination Department / Specialty</label>
+        <input
+          type="text"
+          id="destDeptInput"
+          required
+          value="{{ (case.referral or {}).get('destinationDepartment') or 'Pulmonology / Critical Care Unit' }}"
+          class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-sky-500 outline-none"
+        />
+      </div>
+
+      <div>
+        <label class="block font-bold text-slate-700 uppercase mb-1">Clinical Reason for Referral</label>
+        <input
+          type="text"
+          id="reasonInput"
+          required
+          value="{{ (case.referral or {}).get('reason') or 'Hypoxemic respiratory failure in asthmatic patient with bilateral chest infiltrates.' }}"
+          class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-sky-500 outline-none"
+        />
+      </div>
+
+      <div>
+        <label class="block font-bold text-slate-700 uppercase mb-1">Clinical Transfer Instructions & Notes</label>
+        <textarea
+          id="transferNotesInput"
+          rows="3"
+          class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-sky-500 outline-none"
+        >{{ (case.referral or {}).get('reviewerNotes') or 'Requires immediate high-flow oxygen, nebulization, and arterial blood gas monitoring. Baseline radiography transmitted.' }}</textarea>
+      </div>
+
+      <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+        <a href="{{ url_for('frontend.case_review', case_id=case.patientId) }}" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition">
+          Back to Review
+        </a>
+
+        <button
+          type="submit"
+          id="submitReferralBtn"
+          class="px-6 py-2.5 bg-sky-700 hover:bg-sky-800 text-white font-semibold rounded-xl text-xs shadow-md shadow-sky-700/20 flex items-center gap-2 cursor-pointer"
+        >
+          <i data-lucide="share-2" class="w-4 h-4"></i>
+          <span>Create & Route Referral</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  async function submitReferralAction(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitReferralBtn');
+    btn.disabled = true;
+    btn.innerHTML = 'Routing Referral...';
+
+    const caseId = '{{ case.patientId }}';
+    const payload = {
+      destinationFacility: document.getElementById('destFacilityInput').value,
+      destinationDepartment: document.getElementById('destDeptInput').value,
+      reason: document.getElementById('reasonInput').value,
+      reviewerNotes: document.getElementById('transferNotesInput').value
+    };
+
+    try {
+      const res = await fetch(`/api/cases/${caseId}/referral`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        window.location.href = `/case/${caseId}/handoff`;
+      } else {
+        alert('Failed to create referral.');
+        btn.disabled = false;
+        btn.innerHTML = 'Create & Route Referral';
+      }
+    } catch (err) {
+      alert('Network error: ' + err.message);
+      btn.disabled = false;
+      btn.innerHTML = 'Create & Route Referral';
+    }
+  }
+</script>
+{% endblock %}

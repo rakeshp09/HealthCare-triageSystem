@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In - Healthcare Triage & EHR Platform{% endblock %}
+
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center px-4 py-12">
+  <div class="w-full max-w-md clinic-card p-8 bg-white border border-slate-200/80 shadow-xl space-y-6">
+    
+    <!-- Top Branding Banner -->
+    <div class="text-center">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-teal-700 to-cyan-600 text-white flex items-center justify-center mx-auto shadow-md shadow-teal-700/20 mb-3">
+        <i data-lucide="activity" class="w-6 h-6"></i>
+      </div>
+      <h1 class="text-xl font-black text-slate-900 tracking-tight">
+        TriageFlow Portal
+      </h1>
+      <p class="text-xs text-slate-500 mt-1">
+        Sign in to your clinical workstation or patient health account
+      </p>
+    </div>
+
+    {% if error and error|lower not in ['unauthorized', 'none', '', 'auth_required', 'forbidden', 'logout', 'logged_out'] %}
+    <div class="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-center gap-2">
+      <i data-lucide="alert-circle" class="w-4 h-4 shrink-0 text-rose-600"></i>
+      <span>{{ error }}</span>
+    </div>
+    {% endif %}
+
+    <form id="loginForm" method="POST" action="{{ url_for('auth.login_view') }}" class="space-y-4">
+      <!-- Username -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+          Username
+        </label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+            <i data-lucide="user" class="w-4 h-4"></i>
+          </span>
+          <input
+            type="text"
+            name="username"
+            id="usernameInput"
+            required
+            value="{{ username or '' }}"
+            placeholder="Enter your username"
+            class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition outline-none"
+          />
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+          Password
+        </label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+            <i data-lucide="lock" class="w-4 h-4"></i>
+          </span>
+          <input
+            type="password"
+            name="password"
+            id="passwordInput"
+            required
+            placeholder="••••••••"
+            class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition outline-none"
+          />
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        id="loginSubmitBtn"
+        class="w-full flex items-center justify-center gap-2 py-3 px-4 bg-[#002B5B] hover:bg-[#001D3D] text-white text-xs font-bold rounded-xl shadow-md shadow-[#002B5B]/20 transition hover:-translate-y-0.5 cursor-pointer mt-2"
+      >
+        <span>Sign In to Workstation</span>
+        <i data-lucide="arrow-right" class="w-4 h-4 text-[#C7F2E3]"></i>
+      </button>
+    </form>
+
+    <!-- Quick-Fill Default Accounts for Demo & Testing -->
+    <div class="pt-4 border-t border-slate-100">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Quick Test Credentials</span>
+        <span class="text-[10px] text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full font-semibold">One-Click Fill</span>
+      </div>
+      <div class="grid grid-cols-2 gap-2 text-[11px]">
+        <button
+          type="button"
+          onclick="fillCredentials('patient01', 'patient@123')"
+          class="p-2 bg-slate-50 hover:bg-teal-50 hover:border-teal-200 border border-slate-200 rounded-lg text-left transition"
+        >
+          <div class="font-bold text-slate-800 flex items-center gap-1"><i data-lucide="user" class="w-3 h-3 text-teal-600"></i> Patient</div>
+          <div class="text-[10px] text-slate-500 font-mono">patient01</div>
+        </button>
+
+        <button
+          type="button"
+          onclick="fillCredentials('healthworker01', 'health@123')"
+          class="p-2 bg-slate-50 hover:bg-teal-50 hover:border-teal-200 border border-slate-200 rounded-lg text-left transition"
+        >
+          <div class="font-bold text-slate-800 flex items-center gap-1"><i data-lucide="stethoscope" class="w-3 h-3 text-teal-600"></i> Health Worker</div>
+          <div class="text-[10px] text-slate-500 font-mono">healthworker01</div>
+        </button>
+
+        <button
+          type="button"
+          onclick="fillCredentials('doctor01', 'doctor@123')"
+          class="p-2 bg-slate-50 hover:bg-teal-50 hover:border-teal-200 border border-slate-200 rounded-lg text-left transition"
+        >
+          <div class="font-bold text-slate-800 flex items-center gap-1"><i data-lucide="activity" class="w-3 h-3 text-teal-600"></i> Doctor</div>
+          <div class="text-[10px] text-slate-500 font-mono">doctor01</div>
+        </button>
+
+        <button
+          type="button"
+          onclick="fillCredentials('admin01', 'admin@123')"
+          class="p-2 bg-slate-50 hover:bg-teal-50 hover:border-teal-200 border border-slate-200 rounded-lg text-left transition"
+        >
+          <div class="font-bold text-slate-800 flex items-center gap-1"><i data-lucide="shield" class="w-3 h-3 text-teal-600"></i> Admin</div>
+          <div class="text-[10px] text-slate-500 font-mono">admin01</div>
+        </button>
+      </div>
+    </div>
+
+    <script>
+      function fillCredentials(u, p) {
+        document.getElementById('usernameInput').value = u;
+        document.getElementById('passwordInput').value = p;
+      }
+
+      document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const username = document.getElementById('usernameInput').value.trim();
+        const password = document.getElementById('passwordInput').value;
+        const btn = document.getElementById('loginSubmitBtn');
+        const origBtnText = btn.innerHTML;
+
+        btn.disabled = true;
+        btn.innerHTML = '<span>Signing In...</span>';
+
+        try {
+          const res = await fetch(form.action, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+          });
+          const data = await res.json();
+          if (res.ok && data.success) {
+            if (typeof Swal !== 'undefined') {
+              Swal.fire({
+                icon: 'success',
+                title: 'Login successful',
+                text: data.message || 'Login successful. Redirecting to workstation...',
+                timer: 1200,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+              }).then(() => {
+                window.location.href = data.redirect || '/dashboard';
+              });
+            } else {
+              window.location.href = data.redirect || '/dashboard';
+            }
+          } else {
+            const errorMsg = data.message || data.detail || 'Invalid username or password';
+            if (typeof Swal !== 'undefined') {
+              Swal.fire({
+                icon: 'error',
+                title: 'Authentication Failed',
+                text: errorMsg,
+                timer: 3500,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+              });
+            } else {
+              alert(errorMsg);
+            }
+            btn.disabled = false;
+            btn.innerHTML = origBtnText;
+          }
+        } catch (err) {
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({
+              icon: 'error',
+              title: 'Connection Error',
+              text: 'Unable to reach the server. Please try again.',
+              timer: 3500,
+              showConfirmButton: false,
+              toast: true,
+              position: 'top-end'
+            });
+          } else {
+            alert('Unable to reach server');
+          }
+          btn.disabled = false;
+          btn.innerHTML = origBtnText;
+        }
+      });
+    </script>
+
+    <div class="pt-4 border-t border-slate-100 text-center text-xs text-slate-500">
+      <span>Don't have an account?</span>
+      <a href="{{ url_for('auth.signup_view') }}" class="font-bold text-teal-700 hover:text-teal-800 ml-1">
+        Register Account
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

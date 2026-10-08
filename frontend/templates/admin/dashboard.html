@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+
+{% block title %}System Administration & Governance - TriageFlow{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+  
+  <!-- Header -->
+  <div class="clinic-card p-6 bg-gradient-to-r from-slate-900 to-slate-800 text-white flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2 mb-1.5">
+        <span class="badge-clinic bg-white/10 text-teal-300 border border-white/20">
+          <i data-lucide="shield" class="w-3.5 h-3.5"></i>
+          <span>Clinical Informatics & Staff Governance</span>
+        </span>
+        <span class="text-xs text-slate-400">•</span>
+        <span class="text-xs text-slate-300">{{ user.facility or 'District Health Informatics Command' }}</span>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-black tracking-tight">
+        System Health & Access Governance Console
+      </h1>
+      <p class="text-xs text-slate-400 mt-1">
+        Authorize clinician credentials, oversee EHR data integrity, and manage healthcare sub-center users.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      onclick="window.location.reload()"
+      class="p-2.5 text-slate-300 hover:text-white bg-white/10 hover:bg-white/20 rounded-xl transition cursor-pointer self-start md:self-auto"
+      title="Refresh Data"
+    >
+      <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+    </button>
+  </div>
+
+  <!-- Metric Cards -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+    <div class="clinic-card p-4">
+      <div class="flex items-center justify-between text-slate-500 mb-2">
+        <span class="text-[10px] font-bold uppercase tracking-wider">Total Accounts</span>
+        <i data-lucide="users" class="w-4 h-4 text-teal-600"></i>
+      </div>
+      <div class="text-2xl font-black text-slate-900">{{ users|length }}</div>
+      <span class="text-[10px] text-slate-400">All registered roles</span>
+    </div>
+
+    <div class="clinic-card p-4 border border-amber-200 bg-amber-50/20">
+      <div class="flex items-center justify-between text-amber-700 mb-2">
+        <span class="text-[10px] font-bold uppercase tracking-wider">Pending Approvals</span>
+        <i data-lucide="clock" class="w-4 h-4 text-amber-600"></i>
+      </div>
+      <div class="text-2xl font-black text-amber-900">
+        {{ users|selectattr('status', 'equalto', 'PENDING')|list|length }}
+      </div>
+      <span class="text-[10px] text-amber-700 font-medium">Clinicians awaiting sign-off</span>
+    </div>
+
+    <div class="clinic-card p-4">
+      <div class="flex items-center justify-between text-slate-500 mb-2">
+        <span class="text-[10px] font-bold uppercase tracking-wider">Total Cases</span>
+        <i data-lucide="file-text" class="w-4 h-4 text-indigo-600"></i>
+      </div>
+      <div class="text-2xl font-black text-slate-900">{{ cases|length }}</div>
+      <span class="text-[10px] text-slate-400">Triage consultations</span>
+    </div>
+
+    <div class="clinic-card p-4 border border-rose-200 bg-rose-50/15">
+      <div class="flex items-center justify-between text-rose-700 mb-2">
+        <span class="text-[10px] font-bold uppercase tracking-wider">Active Safety Flags</span>
+        <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-600 animate-pulse"></i>
+      </div>
+      <div class="text-2xl font-black text-rose-900">
+        {{ cases|selectattr('priority', 'equalto', 'HIGH')|list|length }}
+      </div>
+      <span class="text-[10px] text-rose-700 font-medium">Clinical risk tags</span>
+    </div>
+  </div>
+
+  <!-- Staff & Doctor Account Approval Panel -->
+  <div class="clinic-card overflow-hidden">
+    <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="live-badge-dot"></span>
+          <h2 class="text-sm font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            <i data-lucide="shield-check" class="w-4 h-4 text-teal-700"></i>
+            <span>Staff Account Approval & Access Governance</span>
+          </h2>
+        </div>
+        <p class="text-xs text-slate-500">
+          Review and approve Doctor and Staff accounts before granting clinical queue access.
+        </p>
+      </div>
+
+      <!-- Tab Buttons -->
+      <div class="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl text-xs font-bold">
+        <button
+          type="button"
+          onclick="switchTab('pending')"
+          id="btnPendingTab"
+          class="px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs cursor-pointer"
+        >
+          Pending ({{ users|selectattr('status', 'equalto', 'PENDING')|list|length }})
+        </button>
+        <button
+          type="button"
+          onclick="switchTab('all')"
+          id="btnAllTab"
+          class="px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 cursor-pointer"
+        >
+          All Accounts ({{ users|length }})
+        </button>
+      </div>
+    </div>
+
+    <!-- PENDING USERS VIEW -->
+    <div id="pendingTableView" class="p-6">
+      {% set pending_users = users|selectattr('status', 'equalto', 'PENDING')|list %}
+      {% if pending_users|length == 0 %}
+      <div class="text-center py-10 px-4 bg-slate-50/60 rounded-2xl border border-slate-100">
+        <i data-lucide="user-check" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
+        <h3 class="text-xs font-bold text-slate-700">No Pending Approvals</h3>
+        <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+          All Doctor and Staff registration requests have been approved. Newly registered clinical staff will appear here.
+        </p>
+      </div>
+      {% else %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-slate-100 bg-slate-50/80 text-slate-500 font-bold uppercase tracking-wider text-[11px]">
+              <th class="py-3 px-4">Name</th>
+              <th class="py-3 px-4">Username / Email</th>
+              <th class="py-3 px-4">Requested Role</th>
+              <th class="py-3 px-4">Registration Date</th>
+              <th class="py-3 px-4">Status</th>
+              <th class="py-3 px-4 text-right">Approval Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for u in pending_users %}
+            <tr class="hover:bg-slate-50/70 transition">
+              <td class="py-3.5 px-4 font-bold text-slate-900">{{ u.name }}</td>
+              <td class="py-3.5 px-4 text-slate-600">
+                <span class="font-mono text-slate-800 font-bold">{{ u.username }}</span>
+                {% if u.email %}<span class="block text-[10px] text-slate-400">{{ u.email }}</span>{% endif %}
+              </td>
+              <td class="py-3.5 px-4">
+                <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] {% if u.role == 'Doctor' %}bg-indigo-100 text-indigo-800 border border-indigo-200{% else %}bg-teal-100 text-teal-800 border border-teal-200{% endif %}">
+                  {{ u.role }}
+                </span>
+              </td>
+              <td class="py-3.5 px-4 text-slate-500 text-[11px]">{{ u.created_at }}</td>
+              <td class="py-3.5 px-4">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                  <i data-lucide="clock" class="w-3 h-3 text-amber-600"></i>
+                  PENDING
+                </span>
+              </td>
+              <td class="py-3.5 px-4 text-right whitespace-nowrap">
+                <div class="flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    onclick="handleUserAction('{{ u.id }}', 'approve')"
+                    class="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-2xs transition cursor-pointer"
+                  >
+                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                    <span>Approve</span>
+                  </button>
+                  <button
+                    type="button"
+                    onclick="handleUserAction('{{ u.id }}', 'reject')"
+                    class="inline-flex items-center gap-1 px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs shadow-2xs transition cursor-pointer"
+                  >
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    <span>Reject</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- ALL USERS VIEW -->
+    <div id="allTableView" class="p-6 hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-slate-100 bg-slate-50/80 text-slate-500 font-bold uppercase tracking-wider text-[11px]">
+              <th class="py-3 px-4">Name</th>
+              <th class="py-3 px-4">Username / Email</th>
+              <th class="py-3 px-4">Role</th>
+              <th class="py-3 px-4">Status</th>
+              <th class="py-3 px-4">Created</th>
+              <th class="py-3 px-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for u in users %}
+            <tr class="hover:bg-slate-50/70 transition">
+              <td class="py-3.5 px-4 font-bold text-slate-900">{{ u.name }}</td>
+              <td class="py-3.5 px-4 text-slate-600">
+                <span class="font-mono text-slate-800 font-bold">{{ u.username }}</span>
+                {% if u.email %}<span class="block text-[10px] text-slate-400">{{ u.email }}</span>{% endif %}
+              </td>
+              <td class="py-3.5 px-4">
+                <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] {% if u.role == 'Admin' %}bg-slate-200 text-slate-800{% elif u.role == 'Doctor' %}bg-indigo-100 text-indigo-800{% elif u.role == 'Patient' %}bg-emerald-100 text-emerald-800{% else %}bg-teal-100 text-teal-800{% endif %}">
+                  {{ u.role }}
+                </span>
+              </td>
+              <td class="py-3.5 px-4">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold {% if u.status == 'ACTIVE' %}bg-emerald-100 text-emerald-800{% elif u.status == 'PENDING' %}bg-amber-100 text-amber-800{% else %}bg-rose-100 text-rose-800{% endif %}">
+                  {{ u.status }}
+                </span>
+              </td>
+              <td class="py-3.5 px-4 text-slate-500 text-[11px]">{{ u.created_at }}</td>
+              <td class="py-3.5 px-4 text-right">
+                {% if u.role != 'Admin' %}
+                <div class="flex items-center justify-end gap-1.5">
+                  {% if u.status != 'ACTIVE' %}
+                  <button
+                    type="button"
+                    onclick="handleUserAction('{{ u.id }}', 'approve')"
+                    class="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-[11px] font-bold rounded-lg cursor-pointer transition"
+                  >
+                    Activate
+                  </button>
+                  {% endif %}
+                  {% if u.status != 'REJECTED' %}
+                  <button
+                    type="button"
+                    onclick="handleUserAction('{{ u.id }}', 'reject')"
+                    class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 text-[11px] font-bold rounded-lg cursor-pointer transition"
+                  >
+                    Block
+                  </button>
+                  {% endif %}
+                </div>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(tab) {
+  const pendingView = document.getElementById('pendingTableView');
+  const allView = document.getElementById('allTableView');
+  const btnPending = document.getElementById('btnPendingTab');
+  const btnAll = document.getElementById('btnAllTab');
+
+  if (tab === 'pending') {
+    pendingView.classList.remove('hidden');
+    allView.classList.add('hidden');
+    btnPending.className = 'px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs cursor-pointer';
+    btnAll.className = 'px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 cursor-pointer';
+  } else {
+    pendingView.classList.add('hidden');
+    allView.classList.remove('hidden');
+    btnAll.className = 'px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs cursor-pointer';
+    btnPending.className = 'px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 cursor-pointer';
+  }
+}
+
+async function handleUserAction(userId, action) {
+  const endpoint = `/api/admin/users/${userId}/${action}`;
+  try {
+    const res = await fetch(endpoint, { method: 'POST' });
+    if (res.ok) {
+      window.location.reload();
+    } else {
+      alert('Action failed');
+    }
+  } catch (e) {
+    alert('Network error: ' + e.message);
+  }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,730 @@
+{% extends "base.html" %}
+
+{% block title %}New Patient Intake Wizard - TriageFlow{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+  <!-- Header -->
+  <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-xs font-bold uppercase tracking-wider text-teal-800 bg-teal-50 px-2.5 py-0.5 rounded border border-teal-200">
+          5-Step Intake Pipeline
+        </span>
+        <span class="text-xs text-slate-400">•</span>
+        <span class="text-xs text-slate-500">Multimodal Intake</span>
+      </div>
+      <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">
+        New Patient Triage Intake
+      </h1>
+      <p class="text-xs text-slate-500 mt-0.5">
+        Capture patient voice, upload clinical reports, verify physiological vitals, and generate doctor-ready dossiers.
+      </p>
+    </div>
+  </div>
+
+
+  <!-- Wizard Steps Indicator -->
+  <div class="flex items-center justify-between border-b border-slate-200 pb-4 text-xs font-semibold text-slate-500">
+    <div id="stepTab1" class="text-teal-700 flex items-center gap-1 font-bold">
+      <span class="w-5 h-5 rounded-full bg-teal-700 text-white flex items-center justify-center text-[10px]">1</span>
+      <span>Demographics</span>
+    </div>
+    <div id="stepTab2" class="flex items-center gap-1">
+      <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-[10px]">2</span>
+      <span>Multimodal Input</span>
+    </div>
+    <div id="stepTab3" class="flex items-center gap-1">
+      <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-[10px]">3</span>
+      <span>AI Extraction</span>
+    </div>
+    <div id="stepTab4" class="flex items-center gap-1">
+      <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-[10px]">4</span>
+      <span>Vitals & Safety</span>
+    </div>
+    <div id="stepTab5" class="flex items-center gap-1">
+      <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-[10px]">5</span>
+      <span>Review & Send</span>
+    </div>
+  </div>
+
+  <!-- WIZARD STEP 1: Demographics & Consent -->
+  <div id="stepContainer1" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+    <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+      <i data-lucide="user" class="w-4 h-4 text-teal-700"></i>
+      Step 1: Patient Demographics & Consent
+    </h3>
+
+    {% if user and user.role == 'Patient' %}
+    <div class="p-4 bg-teal-50 border border-teal-200 rounded-xl flex items-start gap-3">
+      <i data-lucide="info" class="w-5 h-5 text-teal-700 shrink-0 mt-0.5"></i>
+      <div class="text-xs text-teal-900">
+        <span class="font-bold">Self-Admission Mode:</span> You are submitting a self-admission request for your verified patient account (<span class="font-mono font-bold">{{ user.patient_id or user.username }}</span>). As per clinical protocol, self-admissions are routed to <strong class="underline">Pending Nurse Approval</strong> and reviewed by nursing staff before physician triage.
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+      <div>
+        <label class="block font-bold text-slate-700 uppercase mb-1">Patient ID</label>
+        <input
+          type="text"
+          id="patientIdInput"
+          value="{{ user.patient_id or user.username if user and user.role == 'Patient' else '' }}"
+          placeholder="e.g. PAT-10023"
+          {% if user and user.role == 'Patient' %}readonly class="w-full px-3 py-2 bg-slate-100 border border-slate-300 rounded-xl font-mono text-slate-700 cursor-not-allowed outline-none"{% else %}class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono text-slate-900 focus:bg-white focus:ring-2 focus:ring-teal-500 outline-none"{% endif %}
+        />
+      </div>
+
+      <div>
+        <label class="block font-bold text-slate-700 uppercase mb-1">Age</label>
+        <input type="number" id="ageInput" value="" placeholder="e.g. 45" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:ring-2 focus:ring-teal-500 outline-none" />
+      </div>
+
+      <div>
+        <label class="block font-bold text-slate-700 uppercase mb-1">Gender</label>
+        <select id="genderSelect" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:ring-2 focus:ring-teal-500 outline-none">
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block font-bold text-slate-700 uppercase mb-1">Preferred Language</label>
+        <select id="languageSelect" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:ring-2 focus:ring-teal-500 outline-none">
+          <option value="Hindi">Hindi (हिंदी)</option>
+          <option value="Odia">Odia (ଓଡ଼ିଆ)</option>
+          <option value="Bengali">Bengali (বাংলা)</option>
+          <option value="Tamil">Tamil (தமிழ்)</option>
+          <option value="Telugu">Telugu (తెలుగు)</option>
+          <option value="English">English</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Mandatory Consent Checkbox -->
+    <div class="p-4 bg-teal-50/60 rounded-xl border border-teal-200 text-xs text-teal-900 flex items-center gap-3">
+      <input type="checkbox" id="consentCheckbox" class="w-4 h-4 rounded text-teal-700 focus:ring-teal-500" checked />
+      <label for="consentCheckbox" class="font-medium cursor-pointer">
+        <strong>Mandatory Informed Consent:</strong> I confirm that patient or guardian consent has been obtained for multimodal intake and clinical processing.
+      </label>
+    </div>
+
+    <div class="flex justify-end pt-2">
+      <button type="button" onclick="goToStep(2)" class="px-6 py-2.5 bg-teal-700 hover:bg-teal-800 text-white font-semibold rounded-xl text-xs shadow-xs flex items-center gap-2 cursor-pointer">
+        <span>Proceed to Multimodal Input</span>
+        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- WIZARD STEP 2: Multimodal Input -->
+  <div id="stepContainer2" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 hidden">
+    <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+      <i data-lucide="volume-2" class="w-4 h-4 text-teal-700"></i>
+      Step 2: Patient Voice Narrative & Diagnostic Reports
+    </h3>
+
+    <!-- Audio Support Panel: Recording + File Upload -->
+    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-800 uppercase flex items-center gap-2">
+          <i data-lucide="mic" class="w-4 h-4 text-teal-700"></i>
+          Audio Input Options (Voice Recording & Audio File Upload)
+        </span>
+        <span id="recordTimer" class="font-mono text-xs text-teal-700 font-bold">00:00</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Live Microphone -->
+        <div class="p-3.5 bg-white rounded-xl border border-slate-200 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+              <i data-lucide="mic" class="w-3.5 h-3.5 text-teal-600"></i>
+              Voice Recording
+            </span>
+            <!-- Live Recording State Indicator (Recording Started / Recording Ended) -->
+            <div id="recordingStateBadge" class="hidden"></div>
+          </div>
+          <p class="text-[11px] text-slate-500">Capture voice via microphone and auto-transcribe with AI STT.</p>
+          <div class="flex items-center gap-2 pt-1">
+            <button
+              type="button"
+              id="startRecordBtn"
+              onclick="startVoiceRecording()"
+              class="px-3.5 py-1.5 bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold rounded-lg flex items-center gap-1.5 shadow-2xs cursor-pointer"
+              title="Record Patient Voice with Microphone"
+            >
+              <i data-lucide="mic" class="w-3.5 h-3.5"></i>
+              <span>Record Patient Voice</span>
+            </button>
+
+            <button
+              type="button"
+              id="stopRecordBtn"
+              onclick="stopVoiceRecording()"
+              class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-lg flex items-center gap-1.5 shadow-2xs hidden cursor-pointer"
+              title="Stop Recording"
+            >
+              <i data-lucide="square" class="w-3.5 h-3.5"></i>
+              <span>Stop Recording</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Audio File Upload -->
+        <div class="p-3.5 bg-white rounded-xl border border-slate-200 space-y-2">
+          <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+            <i data-lucide="upload" class="w-3.5 h-3.5 text-indigo-600"></i>
+            Audio File Upload
+          </span>
+          <p class="text-[11px] text-slate-500">Upload recorded voice memo (.wav, .mp3, .ogg, .webm, .m4a).</p>
+          <div class="pt-1">
+            <input
+              type="file"
+              id="audioFileInput"
+              accept=".wav,.mp3,.ogg,.webm,.m4a,audio/*"
+              class="hidden"
+              onchange="handleAudioFileSelect(this)"
+              onclick="this.value=null"
+            />
+            <button
+              type="button"
+              id="uploadAudioBtn"
+              onclick="document.getElementById('audioFileInput').click()"
+              class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-lg flex items-center gap-1.5 border border-slate-300 cursor-pointer"
+              title="Upload Audio File"
+            >
+              <i data-lucide="file-audio" class="w-3.5 h-3.5 text-teal-700"></i>
+              <span>Upload Audio File</span>
+            </button>
+            <div id="audioFileNameDisplay" class="text-[11px] font-mono text-teal-700 mt-1 hidden"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Audio Upload Progress Indicator -->
+      <div id="audioUploadProgress" class="hidden p-3 bg-teal-50 border border-teal-200 rounded-xl text-xs text-teal-800 flex items-center gap-3">
+        <div class="w-4 h-4 border-2 border-teal-600 border-t-transparent rounded-full animate-spin shrink-0"></div>
+        <span id="audioUploadProgressText">Uploading audio and transcribing speech with AI STT...</span>
+      </div>
+
+      <!-- Visible Audio Confirmation Alert Banner -->
+      <div id="audioConfirmationAlert" class="hidden p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600 shrink-0"></i>
+          <span id="audioConfirmationText">Audio uploaded and transcribed successfully!</span>
+        </div>
+        <button type="button" onclick="this.parentElement.classList.add('hidden')" class="text-emerald-700 hover:text-emerald-900 font-bold ml-2 cursor-pointer">✕</button>
+      </div>
+
+      <!-- Attached Audio Card -->
+      <div id="attachedAudioCard" class="hidden p-3 bg-white rounded-xl border border-teal-200 shadow-2xs space-y-2">
+        <div class="flex items-center justify-between gap-3 text-xs">
+          <div class="flex items-center gap-2 overflow-hidden">
+            <div class="w-7 h-7 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center shrink-0">
+              <i data-lucide="music-2" class="w-4 h-4"></i>
+            </div>
+            <div class="truncate">
+              <span id="attachedAudioName" class="font-mono font-bold text-slate-800 block truncate">patient_voice.wav</span>
+              <span id="attachedAudioMeta" class="text-[11px] text-slate-500">124.5 KB • Audio (WAV) • Uploaded</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold text-[10px] border border-emerald-200">
+              Uploaded & Transcribed
+            </span>
+            <button
+              type="button"
+              onclick="deleteAudioAttachment()"
+              class="flex items-center gap-1 px-2.5 py-1 rounded-lg text-rose-600 hover:bg-rose-50 hover:text-rose-700 border border-rose-200 text-xs font-semibold transition cursor-pointer"
+              title="Delete Audio Attachment from frontend & server"
+            >
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              <span>Delete</span>
+            </button>
+          </div>
+        </div>
+        <audio id="audioPlayback" controls class="w-full h-8 mt-1"></audio>
+      </div>
+
+      <!-- Status & Notice -->
+      <div class="pt-1 space-y-1.5">
+        <span id="recordStatusText" class="text-xs text-slate-500 italic">Ready for microphone voice recording or audio file upload.</span>
+      </div>
+    </div>
+
+    <!-- Symptoms Text Area -->
+    <div class="text-xs space-y-1">
+      <label class="block font-bold text-slate-700 uppercase">Spoken Transcript / Chief Narrative</label>
+      <textarea
+        id="intakeTranscriptBox"
+        rows="3"
+        class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-teal-500 outline-none"
+        placeholder="Enter or dictate patient complaints, clinical narrative, or symptoms..."
+      ></textarea>
+    </div>
+
+    <!-- Document Attachment Section -->
+    <div class="p-4 bg-slate-50 rounded-2xl border border-dashed border-slate-300 space-y-3">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-800 uppercase flex items-center gap-2">
+          <i data-lucide="file-text" class="w-4 h-4 text-teal-700"></i>
+          Attach Medical Reports & Diagnostic Scans
+        </span>
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            onclick="syncUploadedFilesFromBackend()"
+            class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-semibold rounded-lg flex items-center gap-1 border border-slate-300 cursor-pointer"
+            title="Sync with backend uploads directory"
+          >
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-teal-700"></i>
+            <span>Sync Uploads</span>
+          </button>
+          <input
+            type="file"
+            id="reportFileInput"
+            accept=".pdf,.png,.jpg,.jpeg,.webp,image/*"
+            class="hidden"
+            onchange="handleReportFileSelect(this)"
+            onclick="this.value=null"
+          />
+          <button
+            type="button"
+            id="attachDocumentBtn"
+            onclick="document.getElementById('reportFileInput').click()"
+            class="px-3.5 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-semibold rounded-lg flex items-center gap-1.5 border border-teal-300 cursor-pointer"
+          >
+            <i data-lucide="paperclip" class="w-3.5 h-3.5 text-teal-700"></i>
+            <span>Attach Document</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Upload Progress Indicator -->
+      <div id="reportUploadProgress" class="hidden p-3 bg-teal-50 border border-teal-200 rounded-xl text-xs text-teal-800 flex items-center gap-3">
+        <div class="w-4 h-4 border-2 border-teal-600 border-t-transparent rounded-full animate-spin shrink-0"></div>
+        <span id="reportUploadProgressText">Uploading and parsing document with OCR...</span>
+      </div>
+
+      <!-- Visible Confirmation Alert Banner -->
+      <div id="reportConfirmationAlert" class="hidden p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600 shrink-0"></i>
+          <span id="reportConfirmationText"></span>
+        </div>
+        <button type="button" onclick="this.parentElement.classList.add('hidden')" class="text-emerald-700 hover:text-emerald-900 font-bold ml-2">✕</button>
+      </div>
+
+      <div id="attachedReportsList" class="space-y-2">
+        <!-- Rendered dynamically by renderAttachedReports() -->
+      </div>
+      <span id="reportUploadStatus" class="text-[11px] text-slate-500 italic block">Upload Chest X-Rays, CBC lab reports, or PDF records for automated OCR analysis.</span>
+    </div>
+
+    <div class="flex justify-between pt-2">
+      <button type="button" onclick="goToStep(1)" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs">
+        Back
+      </button>
+      <button type="button" onclick="goToStep(3)" class="px-6 py-2.5 bg-teal-700 hover:bg-teal-800 text-white font-semibold rounded-xl text-xs shadow-xs flex items-center gap-2 cursor-pointer">
+        <span>Run AI Extraction</span>
+        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- WIZARD STEP 3: AI Extraction -->
+  <div id="stepContainer3" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 hidden">
+    <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+      <i data-lucide="sparkles" class="w-4 h-4 text-purple-600"></i>
+      Step 3: AI Clinical Organization & Extracted Entities
+    </h3>
+
+    <div class="p-4 bg-purple-50/50 rounded-2xl border border-purple-200 space-y-3 text-xs">
+      <div class="font-bold text-purple-900 flex items-center justify-between">
+        <span>Structured Clinical Extraction</span>
+        <span class="text-[10px] bg-purple-100 px-2 py-0.5 rounded text-purple-800">Zero-Hallucination Engine</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-slate-700">
+        <div class="p-3 bg-white rounded-xl border border-purple-100 space-y-1">
+          <span class="text-[11px] font-bold text-slate-500 uppercase">Primary Symptoms</span>
+          <ul id="step3SymptomsList" class="list-disc pl-4 space-y-0.5">
+            <li class="italic text-slate-400">Awaiting intake symptoms...</li>
+          </ul>
+        </div>
+
+        <div class="p-3 bg-white rounded-xl border border-purple-100 space-y-1">
+          <span class="text-[11px] font-bold text-slate-500 uppercase">Duration & Medical History</span>
+          <p><strong>Duration:</strong> <span id="step3Duration" class="font-medium text-slate-800">Not Reported</span></p>
+          <p><strong>Conditions:</strong> <span id="step3Conditions" class="font-medium text-slate-800">None reported</span></p>
+          <p><strong>Allergies:</strong> <span id="step3Allergies" class="font-medium text-slate-800">None reported</span></p>
+        </div>
+      </div>
+
+      <div class="p-3 bg-white rounded-xl border border-purple-100 text-[11px] text-slate-600">
+        <strong>Synthesized Chief Concern:</strong>
+        <p id="step3SynthesizedConcern" class="italic mt-0.5">No symptoms entered yet.</p>
+      </div>
+    </div>
+
+    <div class="flex justify-between pt-2">
+      <button type="button" onclick="goToStep(2)" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs">
+        Back
+      </button>
+      <button type="button" onclick="goToStep(4)" class="px-6 py-2.5 bg-teal-700 hover:bg-teal-800 text-white font-semibold rounded-xl text-xs shadow-xs flex items-center gap-2 cursor-pointer">
+        <span>Proceed to Vitals & Safety</span>
+        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- WIZARD STEP 4: Physical Vitals & Follow-ups -->
+  <div id="stepContainer4" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 hidden">
+    <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+      <i data-lucide="heart-pulse" class="w-4 h-4 text-teal-700"></i>
+      Step 4: Physical Vitals & Clinical Safety Flags
+    </h3>
+
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+      <div>
+        <label class="block font-bold text-slate-700 uppercase mb-1">Temp (°C)</label>
+        <input type="text" id="tempInput" value="" placeholder="e.g. 37.0" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white outline-none" />
+      </div>
+
+      <div>
+        <label class="block font-bold text-slate-700 uppercase mb-1">SpO2 (%)</label>
+        <input type="text" id="spo2Input" value="" placeholder="e.g. 98" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white outline-none" />
+      </div>
+
+      <div>
+        <label class="block font-bold text-slate-700 uppercase mb-1">BP Sys (mmHg)</label>
+        <input type="text" id="bpSysInput" value="" placeholder="e.g. 120" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white outline-none" />
+      </div>
+
+      <div>
+        <label class="block font-bold text-slate-700 uppercase mb-1">BP Dia (mmHg)</label>
+        <input type="text" id="bpDiaInput" value="" placeholder="e.g. 80" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white outline-none" />
+      </div>
+
+      <div>
+        <label class="block font-bold text-slate-700 uppercase mb-1">Heart Rate (bpm)</label>
+        <input type="text" id="hrInput" value="" placeholder="e.g. 72" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white outline-none" />
+      </div>
+
+      <div>
+        <label class="block font-bold text-slate-700 uppercase mb-1">Past Conditions</label>
+        <input type="text" id="pastConditionsInput" value="" placeholder="e.g. Hypertension, None" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white outline-none" />
+      </div>
+
+      <div>
+        <label class="block font-bold text-slate-700 uppercase mb-1">Current Meds</label>
+        <input type="text" id="currentMedsInput" value="" placeholder="e.g. Metformin, None" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white outline-none" />
+      </div>
+
+      <div>
+        <label class="block font-bold text-slate-700 uppercase mb-1">Allergies</label>
+        <input type="text" id="allergiesInput" value="" placeholder="e.g. Penicillin, NKDA" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white outline-none" />
+      </div>
+    </div>
+
+    <!-- Active Safety Signal Alerts -->
+    <div id="safetySignalsAlertBox" class="p-4 bg-teal-50/60 rounded-2xl border border-teal-200 text-xs text-teal-900 space-y-1.5">
+      <div class="font-bold flex items-center gap-1.5">
+        <i data-lucide="shield-check" class="w-4 h-4 text-teal-700"></i>
+        <span>Clinical Safety & Threshold Engine:</span>
+      </div>
+      <p id="safetySignalsStatus" class="text-slate-600">Vitals and clinical signals will be evaluated automatically against clinical safety thresholds upon processing.</p>
+      <ul id="safetySignalsList" class="list-disc pl-4 space-y-1 hidden"></ul>
+    </div>
+
+    <div class="flex justify-between pt-2">
+      <button type="button" onclick="goToStep(3)" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs">
+        Back
+      </button>
+      <button type="button" onclick="goToStep(5)" class="px-6 py-2.5 bg-teal-700 hover:bg-teal-800 text-white font-semibold rounded-xl text-xs shadow-xs flex items-center gap-2 cursor-pointer">
+        <span>Review Case Dossier</span>
+        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- WIZARD STEP 5: Review & Send -->
+  <div id="stepContainer5" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 hidden">
+    <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+      <i data-lucide="check-circle-2" class="w-4 h-4 text-teal-700"></i>
+      Step 5: Review Complete Dossier & Dispatch
+    </h3>
+
+    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3 text-xs">
+      <div class="flex items-center justify-between">
+        <div>
+          <span id="reviewPatientTitle" class="font-bold text-slate-900 text-sm">Patient Record</span>
+          <span id="reviewPatientSub" class="text-slate-500"> • Details</span>
+        </div>
+        <span id="reviewPriorityBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-teal-100 text-teal-800 border border-teal-200">
+          Pending Evaluation
+        </span>
+      </div>
+
+      <div class="text-slate-700 space-y-1">
+        <p><strong>Chief Concern:</strong> <span id="reviewChiefConcern" class="text-slate-600">None provided</span></p>
+        <p><strong>Key Vitals:</strong> <span id="reviewVitals" class="text-slate-600">None recorded</span></p>
+        <p><strong>History:</strong> <span id="reviewHistory" class="text-slate-600">None reported</span></p>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between pt-2">
+      <button type="button" onclick="goToStep(4)" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs">
+        Back
+      </button>
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          onclick="submitIntakeCase('DRAFT')"
+          class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold rounded-xl text-xs cursor-pointer"
+        >
+          Save Draft
+        </button>
+        {% if user and user.role == 'Patient' %}
+        <button
+          type="button"
+          onclick="submitIntakeCase('PENDING_NURSE_APPROVAL')"
+          class="px-6 py-2.5 bg-teal-700 hover:bg-teal-800 text-white font-semibold rounded-xl text-xs shadow-md shadow-teal-700/20 flex items-center gap-2 cursor-pointer"
+        >
+          <i data-lucide="send" class="w-4 h-4"></i>
+          <span>Submit for Nurse Admission Approval</span>
+        </button>
+        {% else %}
+        <button
+          type="button"
+          onclick="submitIntakeCase('READY_FOR_REVIEW')"
+          class="px-6 py-2.5 bg-teal-700 hover:bg-teal-800 text-white font-semibold rounded-xl text-xs shadow-md shadow-teal-700/20 flex items-center gap-2 cursor-pointer"
+        >
+          <i data-lucide="send" class="w-4 h-4"></i>
+          <span>Send to Doctor Review</span>
+        </button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  window.lastVoiceInput = null;
+  window.attachedReports = [];
+
+  function updateStep5Review() {
+    const pid = document.getElementById('patientIdInput').value.trim() || 'Unassigned';
+    const age = document.getElementById('ageInput').value.trim() || 'N/A';
+    const gen = document.getElementById('genderSelect').value;
+    const lang = document.getElementById('languageSelect').value;
+    
+    document.getElementById('reviewPatientTitle').textContent = `Patient ${pid}`;
+    document.getElementById('reviewPatientSub').textContent = ` • ${age} yrs • ${gen} • ${lang}`;
+
+    const symptoms = document.getElementById('intakeTranscriptBox').value.trim();
+    document.getElementById('reviewChiefConcern').textContent = symptoms || 'None dictated';
+
+    const temp = document.getElementById('tempInput').value.trim();
+    const spo2 = document.getElementById('spo2Input').value.trim();
+    const bpSys = document.getElementById('bpSysInput').value.trim();
+    const bpDia = document.getElementById('bpDiaInput').value.trim();
+    const hr = document.getElementById('hrInput').value.trim();
+
+    const vitalsList = [];
+    if (temp) vitalsList.push(`Temp ${temp}°C`);
+    if (spo2) vitalsList.push(`SpO2 ${spo2}%`);
+    if (bpSys && bpDia) vitalsList.push(`BP ${bpSys}/${bpDia} mmHg`);
+    if (hr) vitalsList.push(`HR ${hr} bpm`);
+    document.getElementById('reviewVitals').textContent = vitalsList.length ? vitalsList.join(' • ') : 'No vitals logged';
+
+    const past = document.getElementById('pastConditionsInput').value.trim();
+    const meds = document.getElementById('currentMedsInput').value.trim();
+    const alg = document.getElementById('allergiesInput').value.trim();
+    const histList = [];
+    if (past) histList.push(`Conditions: ${past}`);
+    if (meds) histList.push(`Meds: ${meds}`);
+    if (alg) histList.push(`Allergies: ${alg}`);
+    document.getElementById('reviewHistory').textContent = histList.length ? histList.join(' | ') : 'None documented';
+
+    const spo2Num = parseFloat(spo2);
+    const badge = document.getElementById('reviewPriorityBadge');
+    if (!isNaN(spo2Num) && spo2Num < 92) {
+      badge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-200';
+      badge.textContent = 'High Clinical Alert (Hypoxia)';
+    } else {
+      badge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-teal-100 text-teal-800 border border-teal-200';
+      badge.textContent = 'Standard Triage';
+    }
+  }
+
+  function updateStep3Extraction() {
+    const rawSymptoms = document.getElementById('intakeTranscriptBox')?.value.trim() || '';
+    const pastCond = document.getElementById('pastConditionsInput')?.value.trim() || '';
+    const allergies = document.getElementById('allergiesInput')?.value.trim() || '';
+
+    // Duration extraction: strictly explicit evidence
+    let duration = 'Not Reported';
+    const durMatch = rawSymptoms.match(/\b(?:for|since|past|last)\s+\d+\s*(?:days?|weeks?|hours?|months?|years?|दिन|घंटे|हफ्ते)\b/i) ||
+                     rawSymptoms.match(/\b\d+\s*(?:days?|weeks?|hours?|months?|years?|दिन|घंटे|हफ्ते)\b/i);
+    if (durMatch) {
+      duration = durMatch[0];
+    }
+
+    // Zero-hallucination symptoms: match only explicit symptoms
+    const symListElem = document.getElementById('step3SymptomsList');
+    if (symListElem) {
+      symListElem.innerHTML = '';
+      const symptomKeywords = [
+        { name: 'High Fever / Pyrexia', re: /\b(fever|pyrexia|temperature|बुखार)\b/i },
+        { name: 'Productive Cough', re: /\b(productive cough|cough with phlegm|phlegm|sputum)\b/i },
+        { name: 'Cough', re: /\b(cough|खांसी)\b/i },
+        { name: 'Acute Dyspnea / Shortness of breath', re: /\b(breathless|shortness of breath|dyspnea|difficulty breathing|सांस फूलना)\b/i },
+        { name: 'Acute Chest Pain / Angina', re: /\b(chest pain|angina|chest tightness|सीने में दर्द)\b/i },
+        { name: 'Abdominal Pain', re: /\b(abdominal pain|stomach pain|belly ache|पेट दर्द)\b/i },
+        { name: 'Headache / Cephalea', re: /\b(headache|migraine|सिर दर्द)\b/i },
+        { name: 'Generalized Weakness / Fatigue', re: /\b(weakness|fatigue|lethargy|कमजोरी)\b/i },
+        { name: 'Vomiting / Nausea', re: /\b(vomit|vomiting|nausea|उल्टी)\b/i },
+        { name: 'Sore Throat', re: /\b(sore throat|throat irritation|गले में खराश)\b/i }
+      ];
+
+      const found = [];
+      symptomKeywords.forEach(k => {
+        if (k.re.test(rawSymptoms)) {
+          if (k.name === 'Cough' && found.includes('Productive Cough')) return;
+          found.push(k.name);
+        }
+      });
+
+      if (found.length > 0) {
+        found.forEach(s => {
+          const li = document.createElement('li');
+          li.textContent = `${s} (Explicitly reported)`;
+          symListElem.appendChild(li);
+        });
+      } else if (rawSymptoms) {
+        const li = document.createElement('li');
+        li.textContent = `Patient reported concern: ${rawSymptoms.slice(0, 60)}...`;
+        symListElem.appendChild(li);
+      } else {
+        const li = document.createElement('li');
+        li.className = 'italic text-slate-400';
+        li.textContent = 'No explicit symptoms provided';
+        symListElem.appendChild(li);
+      }
+    }
+
+    const durElem = document.getElementById('step3Duration');
+    if (durElem) durElem.textContent = duration;
+
+    const condElem = document.getElementById('step3Conditions');
+    if (condElem) condElem.textContent = pastCond || 'None reported';
+
+    const algElem = document.getElementById('step3Allergies');
+    if (algElem) algElem.textContent = allergies || 'None reported';
+
+    const concernElem = document.getElementById('step3SynthesizedConcern');
+    if (concernElem) {
+      if (rawSymptoms) {
+        concernElem.textContent = duration !== 'Not Reported' ? `${rawSymptoms} (Duration: ${duration})` : rawSymptoms;
+      } else {
+        concernElem.textContent = 'No symptoms recorded.';
+      }
+    }
+  }
+
+  function goToStep(stepNum) {
+    for (let i = 1; i <= 5; i++) {
+      const container = document.getElementById('stepContainer' + i);
+      const tab = document.getElementById('stepTab' + i);
+      if (i === stepNum) {
+        container.classList.remove('hidden');
+        tab.className = 'text-teal-700 flex items-center gap-1 font-bold';
+        tab.querySelector('span').className = 'w-5 h-5 rounded-full bg-teal-700 text-white flex items-center justify-center text-[10px]';
+      } else {
+        container.classList.add('hidden');
+        tab.className = 'flex items-center gap-1 text-slate-500';
+        tab.querySelector('span').className = 'w-5 h-5 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-[10px]';
+      }
+    }
+    if (stepNum === 2) {
+      if (typeof renderAttachedReports === 'function') {
+        renderAttachedReports();
+      }
+    }
+    if (stepNum === 3) {
+      updateStep3Extraction();
+    }
+    if (stepNum === 5) {
+      updateStep5Review();
+    }
+    if (window.lucide) lucide.createIcons();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Files must NOT auto-attach on page load or refresh.
+    // Explicit user action (clicking "Attach Document" or "Sync Uploads") is required.
+    if (typeof renderAttachedReports === 'function') {
+      renderAttachedReports();
+    }
+  });
+
+  async function submitIntakeCase(status) {
+    const patientId = document.getElementById('patientIdInput').value.trim();
+    if (!patientId) {
+      alert('Please enter or verify a Patient Identifier.');
+      goToStep(1);
+      return;
+    }
+    const ageVal = parseInt(document.getElementById('ageInput').value);
+    const payload = {
+      patientId: patientId,
+      age: isNaN(ageVal) ? null : ageVal,
+      gender: document.getElementById('genderSelect').value || 'Other',
+      language: document.getElementById('languageSelect').value || 'English',
+      consentObtained: document.getElementById('consentCheckbox').checked,
+      symptoms: document.getElementById('intakeTranscriptBox').value.trim(),
+      status: status,
+      vitals: {
+        temperature: document.getElementById('tempInput').value.trim(),
+        spo2: document.getElementById('spo2Input').value.trim(),
+        bloodPressureSys: document.getElementById('bpSysInput').value.trim(),
+        bloodPressureDia: document.getElementById('bpDiaInput').value.trim(),
+        heartRate: document.getElementById('hrInput').value.trim()
+      },
+      medicalHistory: {
+        pastConditions: document.getElementById('pastConditionsInput').value.trim(),
+        currentMedications: document.getElementById('currentMedsInput').value.trim(),
+        allergies: document.getElementById('allergiesInput').value.trim()
+      }
+    };
+
+    // Attach processed audio transcript and reports if available
+    if (window.lastVoiceInput) {
+      payload.voiceInput = window.lastVoiceInput;
+    }
+    if (window.attachedReports && window.attachedReports.length > 0) {
+      payload.reports = window.attachedReports;
+    }
+
+    try {
+      const res = await fetch('/api/cases', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        window.location.href = `/case/${payload.patientId}`;
+      } else {
+        const err = await res.json();
+        alert('Intake submission failed: ' + (err.error || 'Check input details'));
+      }
+    } catch (e) {
+      alert('Network error: ' + e.message);
+    }
+  }
+</script>
+{% endblock %}
